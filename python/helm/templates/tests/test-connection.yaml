@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "mina-ombud-python-server.fullname" . }}-test-connection"
+  labels:
+    {{- include "mina-ombud-python-server.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "mina-ombud-python-server.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

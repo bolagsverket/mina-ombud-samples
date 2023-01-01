@@ -1,0 +1,652 @@
+{
+	"info": {
+		"_postman_id": "cf0ef0cc-9e2a-4987-b97e-d57d126df4f4",
+		"name": "Mina ombud",
+		"description": "Exempel på anrop till Mina ombuds API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13114174"
+	},
+	"item": [
+		{
+			"name": "Slutanvändare",
+			"item": [
+				{
+					"name": "/sok/behorigheter",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-id-token",
+								"value": "{{id_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-service-name",
+								"value": "{{service_name}}",
+								"type": "text"
+							},
+							{
+								"key": "x-request-id",
+								"value": "{{$randomUUID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// OBS: kommentarerna tas bort i Pre-request Script.\r\n{\r\n    // Person som har fullmakt\r\n    \"fullmaktshavare\": {\r\n        \"id\": \"{{user_id}}\",\r\n        \"typ\": \"pnr\" // pnr, samnr, gdnr, orgnr\r\n    },\r\n    // Var fullmakten gäller (organisationsnummer)\r\n    \"tredjeman\": \"2120000829\",\r\n    // Begär behörigheter utfärdade av en organisation.\r\n    // Krävs för att skilja mellan behörigheter utfärdade av en enskild näringsidkares\r\n    // företag till skillnad från näringsidkaren personligen.\r\n    \"fullmaktsgivarroll\": [\"ORGANISATION\"],\r\n     // Filtrera behörigheter\r\n     \"behorigheter\": [\r\n        \"5611f2d8-c74e-46e4-aab1-b2f0bd4ce318\"\r\n    ],\r\n    // Paginering\r\n    \"page\": {\r\n        \"page\": 0,\r\n        \"size\": 100\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/sok/behorigheter",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"sok",
+								"behorigheter"
+							]
+						},
+						"description": "Sök behörigheter för en fullmaktshavare."
+					},
+					"response": []
+				},
+				{
+					"name": "/sok/fullmakter",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-id-token",
+								"value": "{{id_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-service-name",
+								"value": "{{service_name}}",
+								"type": "text"
+							},
+							{
+								"key": "x-request-id",
+								"value": "{{$randomUUID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// OBS: kommentarerna tas bort i Pre-request Script.\r\n{\r\n    // Person som har fullmakt\r\n    \"fullmaktshavare\": {\r\n        \"id\": \"{{user_id}}\",\r\n        \"typ\": \"pnr\" // pnr, samnr, gdnr, orgnr\r\n    },\r\n    // Var fullmakten gäller (organisationsnummer)\r\n    // Utelämna för att returnera alla som du har behörighet till\r\n    \"tredjeman\": [\"2120000829\"],\r\n    // Begär behörigheter utfärdade av en organisation.\r\n    // Krävs för att skilja mellan behörigheter utfärdade av en enskild näringsidkares\r\n    // företag till skillnad från näringsidkaren personligen.\r\n    \"fullmaktsgivarroll\": [\"ORGANISATION\"],\r\n    // Returnera endast fullmakter som gäller just nu\r\n    \"status\": \"GILTIG\",\r\n    // Paginering\r\n    \"page\": {\r\n        \"page\": 0,\r\n        \"size\": 100\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/sok/fullmakter",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"sok",
+								"fullmakter"
+							]
+						},
+						"description": "Sök fullmakter för en fullmaktshavare eller fullmaktsgivare."
+					},
+					"response": []
+				},
+				{
+					"name": "/tredjeman/:tm/fullmakter/:id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-id-token",
+								"value": "{{id_token}}",
+								"type": "text"
+							},
+							{
+								"key": "x-service-name",
+								"value": "{{service_name}}",
+								"type": "text"
+							},
+							{
+								"key": "x-request-id",
+								"value": "{{$randomUUID}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/tredjeman/:tredjeman/fullmakter/:fullmakt",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"tredjeman",
+								":tredjeman",
+								"fullmakter",
+								":fullmakt"
+							],
+							"variable": [
+								{
+									"key": "tredjeman",
+									"value": "2120000829"
+								},
+								{
+									"key": "fullmakt",
+									"value": ""
+								}
+							]
+						},
+						"description": "Hämta en fullmakt."
+					},
+					"response": []
+				},
+				{
+					"name": "Begär ID-token för testanvändare",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const user_id = pm.request.body.raw\r",
+									"if (pm.response.code === 200) {\r",
+									"    console.log(`Updating id token for ${user_id}`)\r",
+									"    pm.collectionVariables.set('id_token', pm.response.text())\r",
+									"} else {\r",
+									"    console.error(`Failed to update id token for ${user_id}`)\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{user_id}}"
+						},
+						"url": {
+							"raw": "{{test_auth_url}}/user",
+							"host": [
+								"{{test_auth_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Anropa API där slutanvändaren är någon av\n\n- fullmaktshavare\n- fullmaktsgivare / representerar fullmaktsgivare (t.ex firmatecknare, vd)\n    \n\nDenna typ av anrop är normalfallet när Mina ombud integreras i en annan tjänst där användaren kan agera med en fullmakt.\n\nEn access token ska begäras med scope `user:self` och i varje API-anrop ska headern `x-id-token` innehålla en token som identifierar användaren.",
+			"auth": {
+				"type": "oauth2",
+				"oauth2": [
+					{
+						"key": "tokenName",
+						"value": "mina_ombud_token",
+						"type": "string"
+					},
+					{
+						"key": "scope",
+						"value": "user:self",
+						"type": "string"
+					},
+					{
+						"key": "clientSecret",
+						"value": "{{api_client_secret}}",
+						"type": "string"
+					},
+					{
+						"key": "clientId",
+						"value": "{{api_client_id}}",
+						"type": "string"
+					},
+					{
+						"key": "accessTokenUrl",
+						"value": "{{token_endpoint}}",
+						"type": "string"
+					},
+					{
+						"key": "grant_type",
+						"value": "client_credentials",
+						"type": "string"
+					},
+					{
+						"key": "addTokenTo",
+						"value": "header",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"function decodeBase64(b64) {",
+							"    return decodeURIComponent(escape(atob(b64)));",
+							"}",
+							"",
+							"function btoaUrl(bytes) {",
+							"    return btoa(bytes).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');",
+							"}",
+							"",
+							"function encodeBase64(str) {",
+							"    const percent = encodeURIComponent(str);",
+							"    const unescaped = unescape(percent);",
+							"    return btoaUrl(unescaped);",
+							"}",
+							"",
+							"function decodeTokenClaims(token) {",
+							"    if (token && token.indexOf(\"{\") >= 0) {",
+							"        return JSON.parse(token)",
+							"    } else if (token && token.indexOf(\".\") >= 0) {",
+							"        return JSON.parse(decodeBase64(token.split('.')[1]))",
+							"    } else if (token) {",
+							"        return JSON.parse(decodeBase64(token))",
+							"    } else {",
+							"        return {}",
+							"    }",
+							"}",
+							"",
+							"const auto_update = pm.variables.get('auto_update_id_token')",
+							"",
+							"if (/^(true|1|on|yes)$/.test(auto_update)) {",
+							"    let id_token = pm.collectionVariables.get('id_token') || ''",
+							"    const id_claims = decodeTokenClaims(id_token)",
+							"    const now = Math.ceil(Date.now() / 1000)",
+							"    //console.log(JSON.stringify(id_claims, null, 2))",
+							"    //console.log('exp=' + new Date(id_claims.exp*1000), id_claims.exp, 'now=' + new Date(now*1000), now)",
+							"    if (!id_token || (id_claims.exp && now >= id_claims.exp)) {",
+							"        const user_id = pm.variables.replaceIn(pm.variables.get('user_id'))",
+							"        const url = pm.variables.get('test_auth_url')",
+							"        console.log(`Updating stale ID token`)",
+							"        const id_token_request = {",
+							"            url: pm.variables.replaceIn(url) + '/user',",
+							"            method: 'POST',",
+							"            header: {",
+							"                'Content-Type': 'text/plain'",
+							"            },",
+							"            body: {",
+							"                mode: 'raw',",
+							"                raw: user_id",
+							"            }",
+							"        }",
+							"        pm.sendRequest(id_token_request, (err, res) => {",
+							"            if (err) {",
+							"                console.error(err)",
+							"                throw new Error('ID token request failed')",
+							"            }",
+							"",
+							"            const token_response = res.text()",
+							"            console.log(`ID token updated for ${user_id}`)",
+							"            pm.collectionVariables.set('id_token', token_response)",
+							"        })",
+							"    }",
+							"}",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "M2M",
+			"item": [
+				{
+					"name": "/sok/behorigheter",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-service-name",
+								"value": "{{service_name}}-m2m",
+								"type": "text"
+							},
+							{
+								"key": "x-request-id",
+								"value": "{{$randomUUID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// Se motsvarande i mappen Slutanvändare för mer information\r\n{\r\n    \"fullmaktshavare\": {\r\n        \"id\": \"{{user_id}}\",\r\n        \"typ\": \"pnr\"\r\n    },\r\n    \"tredjeman\": \"2120000829\",\r\n    \"fullmaktsgivarroll\": [\"ORGANISATION\"],\r\n     \"behorigheter\": [\r\n        \"5611f2d8-c74e-46e4-aab1-b2f0bd4ce318\"\r\n    ],\r\n    \"page\": {\r\n        \"page\": 0,\r\n        \"size\": 100\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/sok/behorigheter",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"sok",
+								"behorigheter"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/sok/fullmakter",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-service-name",
+								"value": "{{service_name}}-mtm",
+								"type": "text"
+							},
+							{
+								"key": "x-request-id",
+								"value": "{{$randomUUID}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// Se motsvarande i mappen Slutanvändare för mer information\r\n{\r\n    \"fullmaktshavare\": {\r\n        \"id\": \"{{user_id}}\",\r\n        \"typ\": \"pnr\"\r\n    },\r\n    \"tredjeman\": [\"2120000829\"],\r\n    \"fullmaktsgivarroll\": [\"ORGANISATION\"],\r\n    \"status\": \"GILTIG\",\r\n    \"page\": {\r\n        \"page\": 0,\r\n        \"size\": 100\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/sok/fullmakter",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"sok",
+								"fullmakter"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/tredjeman/:tm/fullmakter/:id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-service-name",
+								"value": "{{service_name}}",
+								"type": "text"
+							},
+							{
+								"key": "x-request-id",
+								"value": "{{$randomUUID}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/tredjeman/:tredjeman/fullmakter/:fullmakt",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"tredjeman",
+								":tredjeman",
+								"fullmakter",
+								":fullmakt"
+							],
+							"variable": [
+								{
+									"key": "tredjeman",
+									"value": "2120000829"
+								},
+								{
+									"key": "fullmakt",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Anropa API:er som system (maskin-till-maskin).\n\nDenna typ av anrop ska endast användas för systembearbetning av fullmakter. När en användare direkt interagerar med en tjänst/applikation så ska API-anrop göras som den användaren.\n\nBegär access token med scope `user:any` och anropa API utan header `x-id-token`.",
+			"auth": {
+				"type": "oauth2",
+				"oauth2": [
+					{
+						"key": "scope",
+						"value": "user:any",
+						"type": "string"
+					},
+					{
+						"key": "tokenName",
+						"value": "mina_ombud_m2m_token",
+						"type": "string"
+					},
+					{
+						"key": "clientSecret",
+						"value": "{{api_client_secret}}",
+						"type": "string"
+					},
+					{
+						"key": "clientId",
+						"value": "{{api_client_id}}",
+						"type": "string"
+					},
+					{
+						"key": "accessTokenUrl",
+						"value": "{{token_endpoint}}",
+						"type": "string"
+					},
+					{
+						"key": "grant_type",
+						"value": "client_credentials",
+						"type": "string"
+					},
+					{
+						"key": "addTokenTo",
+						"value": "header",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "JSON Web Key Set",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api_url}}/tredjeman/:tm/jwks",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"tredjeman",
+						":tm",
+						"jwks"
+					],
+					"variable": [
+						{
+							"key": "tm",
+							"value": "2120000829"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"let body = pm.request.body.raw",
+					"if (body) {",
+					"    // Ta bort kommentarer",
+					"    body = body.replace(/^\\s*\\/\\/.*$/gm, '')",
+					"    body = body.replace(/^(.*)\\/\\/.*$/gm, '$1')",
+					"    body = body.replace(/\\r/g, '').replace(/\\s+\\n{2,}/g, '').trim()",
+					"    if (body.startsWith('{')) {",
+					"        pm.request.body.raw = body",
+					"    }",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api_host",
+			"value": "https://fullmakt-test.minaombud.se",
+			"type": "string"
+		},
+		{
+			"key": "api_url",
+			"value": "{{api_host}}/dfm/formedlare/v1",
+			"type": "string"
+		},
+		{
+			"key": "test_auth_url",
+			"value": "{{api_host}}/sample",
+			"type": "string"
+		},
+		{
+			"key": "id_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token_endpoint",
+			"value": "https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token",
+			"type": "string"
+		},
+		{
+			"key": "api_client_id",
+			"value": "mina-ombud-sample",
+			"type": "string"
+		},
+		{
+			"key": "api_client_secret",
+			"value": "3392d044-d0f2-491d-a40d-edda4f1361c0",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "198602262381",
+			"type": "string"
+		},
+		{
+			"key": "service_name",
+			"value": "postman",
+			"type": "string"
+		},
+		{
+			"key": "auto_update_id_token",
+			"value": "true",
+			"type": "string"
+		}
+	]
+}

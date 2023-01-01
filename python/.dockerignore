@@ -1,0 +1,5 @@
+**/*
+!/src
+!/docker-entrypoint.sh
+!/pyproject.toml
+!/data
