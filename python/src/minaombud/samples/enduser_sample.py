@@ -25,8 +25,8 @@ from minaombud.model import JwsSig
 def sample():
     ### 1. User claims
     iat = int(time.time())  # Time of issue
-    exp = iat + 60  # Expiry time 1 minute
-    ssn = "198602262381"  # Social security number
+    exp = iat + 60 * 2      # Expiry time 2 minutes
+    ssn = "198602262381"    # Social security number
     user_claims = {
         "https://claims.oidc.se/1.0/personalNumber": ssn,
         # "https://claims.oidc.se/1.0/coordinationNumber": ssn,
@@ -37,6 +37,7 @@ def sample():
         "exp": exp,
         "iss": "http://localhost",
         "aud": "mina-ombud",
+        "sub": "9ebe70e4-ca61-11ed-97ed-00155d52ccdb"
     }
 
     ### 2. Sign claims
@@ -78,7 +79,7 @@ def sample():
         "fullmaktsgivarroll": ["ORGANISATION"],  # Filter on issuer type
         # "fullmaktsgivare": { "id": "556...", "typ": "orgnr" },# Filter on issuer of permissions
         # "behorigheter": [                                     # Filter on specific permissions
-        #     "5611f2d8-c74e-46e4-aab1-b2f0bd4ce318"
+        #     "ac94b31e-a17f-11ed-b19d-00155d41fac2"
         # ],
         "page": {"page": 0, "size": 100},  # Pagination
     }
@@ -95,9 +96,9 @@ def sample():
     content_type = behorigheter_response.headers.get("content-type")
     if content_type != "application/json":
         for kontext, v in behorigheter_response.headers.items():
-            print(f"{kontext}: {v}")
-        print()
-        print(behorigheter_response.text)
+            print(f"{kontext}: {v}", file=sys.stderr)
+        print(file=sys.stderr)
+        print(behorigheter_response.text, file=sys.stderr)
         return
 
     print(json.dumps(behorigheter_response.json(), indent=2))

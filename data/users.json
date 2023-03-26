@@ -1,47 +1,55 @@
 [
   {
+    "sub": "9335ccea-ca61-11ed-86b5-00155d52ccdb",
     "name": "Herman Ört",
     "given_name": "Bernt Herman",
     "family_name": "Ört",
     "https://claims.oidc.se/1.0/personalNumber": "195004112354"
   },
   {
+    "sub": "970840aa-ca61-11ed-87f6-00155d52ccdb",
     "name": "Petronella Malteskog",
     "given_name": "Petronella",
     "family_name": "Malteskog",
     "https://claims.oidc.se/1.0/personalNumber": "198602102389"
   },
   {
+    "sub": "9b05d924-ca61-11ed-95b5-00155d52ccdb",
     "name": "Maria Johansson",
     "given_name": "Anette Maria",
     "family_name": "Johansson",
     "https://claims.oidc.se/1.0/personalNumber": "196709132887"
   },
   {
+    "sub": "9ebe70e4-ca61-11ed-97ed-00155d52ccdb",
     "name": "Beri Ylles",
     "given_name": "Beri",
     "family_name": "Ylles",
     "https://claims.oidc.se/1.0/personalNumber": "198602262381"
   },
   {
+    "sub": "a2c8ebba-ca61-11ed-9223-00155d52ccdb",
     "name": "Paul Ingemar Vall",
     "given_name": "Paul Ingemar",
     "family_name": "Vall",
     "https://claims.oidc.se/1.0/personalNumber": "195809132896"
   },
   {
+    "sub": "a56b03b2-ca61-11ed-a832-00155d52ccdb",
     "name": "Justin Wikström",
     "given_name": "Justin",
     "family_name": "Wikström",
     "https://claims.oidc.se/1.0/personalNumber": "198602062393"
   },
   {
+    "sub": "a7e97646-ca61-11ed-89a8-00155d52ccdb",
     "name": "Riitta Rantanen",
     "given_name": "Riitta",
     "family_name": "Rantanen",
     "https://claims.oidc.se/1.0/personalNumber": "198602052386"
   },
   {
+    "sub": "ab27b9da-ca61-11ed-8fbb-00155d52ccdb",
     "given_name": "Jenny",
     "family_name": "Svensson",
     "https://claims.oidc.se/1.0/personalNumber": "198101052382"

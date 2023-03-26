@@ -13,6 +13,7 @@
 # user represents a party to the Power of attorney.
 #
 import json
+import sys
 import time
 import uuid
 
@@ -27,7 +28,7 @@ from minaombud.crypto.jwkset import JwkSet
 def sample():
     ### 1. User claims
     iat = int(time.time())  # Time of issue
-    exp = iat + 60  # Expiry time 1 minute
+    exp = iat + 60 * 2      # Expiry time 2 minutes
     user_claims = {
         "preferred_username": "casey",
         "https://claims.oidc.se/1.0/personalNumber": "200001152388",
@@ -38,6 +39,7 @@ def sample():
         "exp": exp,
         "iss": "http://localhost",
         "aud": "mina-ombud",
+        "sub": "27c1e82f-08d9-4061-b43e-82f9419e7ece"
     }
 
     ### 2. Sign claims
@@ -94,9 +96,9 @@ def sample():
         print(json.dumps(fullmakter_response.json(), indent=2))
     else:
         for k, v in fullmakter_response.headers.items():
-            print(f"{k}: {v}")
-        print()
-        print(fullmakter_response.text)
+            print(f"{k}: {v}", file=sys.stderr)
+        print(file=sys.stderr)
+        print(fullmakter_response.text, file=sys.stderr)
 
 
 if __name__ == "__main__":

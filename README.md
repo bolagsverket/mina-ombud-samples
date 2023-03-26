@@ -186,6 +186,7 @@ Följande krav finns på den JWS som innehåller användarinformation
   som inte identifieras med person- eller samordningsnummer
   och inte är part i fullmakten (t.ex. personer som representerar
   tredje man).
+- Attributet `sub` ska finnas.
 
 Om ett autentiseringssystem redan finns som använder
 OpenID Connect och följer [OIDC Swedens draft](https://github.com/oidc-sweden/specifications/blob/main/swedish-oidc-attribute-specification.md#attributes-and-claims)
@@ -259,6 +260,7 @@ const user_token = sign_claims({
   "iat": 1669031653,
   "exp": 1669031953,
   "iss": "https://auth.example.com/test",
-  "aud": "mina-ombud-sample"
+  "aud": "mina-ombud",
+  "sub": "9ebe70e4-ca61-11ed-97ed-00155d52ccdb"
 }, jwk)
 ```

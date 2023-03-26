@@ -29,6 +29,7 @@ var exp = iat + 60 * 2;
 const string ssn = "198602262381"; // Social security number
 var userClaims = new Dictionary<string, object>
 {
+    { "sub", Guid.NewGuid().ToString() },
     { "https://claims.oidc.se/1.0/personalNumber", ssn },
     { "name", "Beri Ylles" },
     { "given_name", "Beri" },
@@ -82,7 +83,7 @@ var request = new HamtaBehorigheterRequest()
     // Request permissions for specific issuer
     // Fullmaktsgivare = new Identitetsbeteckning("556...", "orgnr"),
     // Filter on specific permissions
-    // Behorigheter = new List<string> { "5611f2d8-c74e-46e4-aab1-b2f0bd4ce318" }
+    // Behorigheter = new List<string> { "ac94b31e-a17f-11ed-b19d-00155d41fac2" }
 };
 
 var response = await ApiPost<HamtaBehorigheterResponse>($"{apiUrl}/sok/behorigheter", request);
