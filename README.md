@@ -4,6 +4,7 @@ Exempelkod som kan användas för att testa mot Mina ombuds testmiljö.
 
 Exempel finns för
 - [C#/.NET](dotnet)
+- [Java](java)
 - [Python](python)
 
 ## Att anropa API:er
