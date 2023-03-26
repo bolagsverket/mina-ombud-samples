@@ -67,7 +67,7 @@ def main():
     subparsers = parser.add_subparsers(dest="cmd", help="kommando")
 
     def behorigheter_args():
-        p = subparsers.add_parser("behorighet", help="sök behörigheter")
+        p = subparsers.add_parser("behorigheter", help="sök behörigheter")
         p.add_argument(
             "--fullmaktsgivare",
             metavar="ORGNR",
@@ -87,7 +87,7 @@ def main():
         )
 
     def fullmakter_args():
-        p = subparsers.add_parser("fullmakt", help="sök fullmakter")
+        p = subparsers.add_parser("fullmakter", help="sök fullmakter")
         p.add_argument("--tredjeman", metavar="ORGNR", action="append")
         p.add_argument(
             "--fullmaktsgivare",
@@ -151,7 +151,7 @@ def main():
         url=args.url,
     )
 
-    if args.cmd == "behorighet":
+    if args.cmd == "behorigheter":
         fullmaktshavare = Identitetsbeteckning.from_id(args.fullmaktshavare)
         if args.fullmaktsgivare:
             fullmaktsgivare = Identitetsbeteckning.from_id(args.fullmaktsgivare)
@@ -166,7 +166,7 @@ def main():
             user_token=user_token,
         )
 
-    elif args.cmd == "fullmakt":
+    elif args.cmd == "fullmakter":
         if args.fullmaktshavare:
             fullmaktshavare = Identitetsbeteckning.from_id(args.fullmaktshavare)
         else:
