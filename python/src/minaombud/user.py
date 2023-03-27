@@ -1,6 +1,7 @@
 import json
 import re
 import time
+import uuid
 from typing import Mapping, Any, Optional, List, Dict, Sequence
 
 from minaombud.crypto import jose
@@ -254,6 +255,9 @@ def create_user_token(
 
     if expiry_time and "exp" not in claims:
         claims["exp"] = claims["int"] + expiry_time
+
+    if "sub" not in claims:
+        claims["sub"] = str(uuid.uuid4())
 
     return jose.sign(claims, jwks)
 
