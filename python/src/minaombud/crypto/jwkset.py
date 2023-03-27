@@ -11,8 +11,8 @@ import requests
 from cryptography.hazmat.primitives._serialization import Encoding, PublicFormat
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey, RSAPublicKey
 from cryptography.hazmat.primitives.asymmetric.types import (
-    PRIVATE_KEY_TYPES,
-    PUBLIC_KEY_TYPES,
+    PrivateKeyTypes,
+    PublicKeyTypes,
 )
 from cryptography.hazmat.primitives.serialization import (
     load_pem_private_key,
@@ -308,7 +308,7 @@ class JwkSet(Mapping[str, Jwk]):
         raise ValueError("PKCS#12 contains no keys or certificates")
 
 
-def _same_public_key(k1: PUBLIC_KEY_TYPES, k2: PUBLIC_KEY_TYPES):
+def _same_public_key(k1: PublicKeyTypes, k2: PublicKeyTypes):
     if type(k1) != type(k2):
         return False
     b1 = k1.public_bytes(Encoding.DER, PublicFormat.SubjectPublicKeyInfo)
@@ -387,7 +387,7 @@ class RemoteJwkSet(JwkSet):
 
 
 def _from_private_key(
-    private_key: PRIVATE_KEY_TYPES,
+    private_key: PrivateKeyTypes,
     certificates: Optional[List[Certificate]] = None,
     kid: Optional[str] = None,
 ) -> ParsedJwk:
@@ -400,7 +400,7 @@ def _from_private_key(
 
 
 def _from_public_key(
-    public_key: PUBLIC_KEY_TYPES,
+    public_key: PublicKeyTypes,
     certificates: Optional[List[Certificate]] = None,
     kid: Optional[str] = None,
 ) -> ParsedJwk:
