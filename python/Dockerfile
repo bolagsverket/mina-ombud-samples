@@ -12,6 +12,16 @@ RUN pipargs="--disable-pip-version-check"; \
   fi;  \
   ${VENV}/bin/pip install $pipargs .[server]
 
+RUN ${VENV}/bin/python -m venv /venv.dev
+RUN pipargs="--disable-pip-version-check"; \
+  if [ ${DISABLE_SSL_TRUST} -ne 0 ]; then \
+    pipargs="$pipargs --trusted-host pypi.python.org --trusted-host pypi.org"; \
+  fi
+RUN /venv.dev/bin/pip install $pipargs .[dev]
+COPY tests/ ./tests
+COPY data/ ./data
+RUN /venv.dev/bin/pytest
+
 FROM python:3.9-alpine
 ENV PATH=/venv/bin:$PATH \
     MINA_OMBUD_SAMPLE_DATA=/data
