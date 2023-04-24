@@ -64,7 +64,7 @@ class SampleBase {
             }
         }
 
-        return handleResponse(conn, type);
+        return handleResponse(conn, type, headers);
     }
 
     static <T> T get(Class<T> type, String url) throws IOException {
@@ -80,12 +80,12 @@ class SampleBase {
         conn.setRequestProperty("accept", "application/json");
         headers.forEach(conn::setRequestProperty);
 
-        return handleResponse(conn, type);
+        return handleResponse(conn, type, headers);
     }
 
-    static <T> T handleResponse(HttpURLConnection conn, Class<T> type) throws IOException {
+    static <T> T handleResponse(HttpURLConnection conn, Class<T> type, Map<String, String> headers) throws IOException {
         var status = conn.getResponseCode();
-        try (var is = conn.getErrorStream() != null ? conn.getErrorStream() : conn.getInputStream()) {
+        try (var is = status >= 400 ? conn.getErrorStream() : conn.getInputStream()) {
             var response = is != null ? is.readAllBytes() : new byte[0];
             var responseType = Optional.ofNullable(conn.getContentType())
                 .map(t -> t.split(";")[0].trim())
@@ -93,6 +93,12 @@ class SampleBase {
             var isJson = "application/json".equals(responseType) || responseType.endsWith("+json");
             if (status >= 400 || (!isJson && response.length > 0)) {
                 System.err.println("> " + conn.getRequestMethod() + ' ' + conn.getURL());
+                for (var  h : headers.entrySet()) {
+                    System.err.println("> " + h.getKey() + ": " + h.getValue());
+                }
+
+                System.err.println();
+
                 String responseLine = Optional.ofNullable(conn.getHeaderField(null))
                     .orElse("HTTP/1.1 " + status + ' ' + conn.getResponseMessage());
                 System.err.println("< " + responseLine);
