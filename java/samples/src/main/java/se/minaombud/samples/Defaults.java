@@ -19,7 +19,7 @@ public final class Defaults {
         getConfig("MINA_OMBUD_API_CLIENT_SECRET", "3392d044-d0f2-491d-a40d-edda4f1361c0");
 
     public static final URI MINA_OMBUD_API_TOKEN_URL = URI.create(getConfig("MINA_OMBUD_API_TOKEN_URL",
-        "https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token"));
+        "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token"));
 
     public static final URI MINA_OMBUD_API_URL =
         URI.create(getConfig("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v1"));
