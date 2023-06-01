@@ -620,7 +620,7 @@
 		},
 		{
 			"key": "token_endpoint",
-			"value": "https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token",
+			"value": "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token",
 			"type": "string"
 		},
 		{
