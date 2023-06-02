@@ -25,10 +25,12 @@ class ApiClientTestIT {
         getConfig("MINA_OMBUD_API_CLIENT_SECRET", "3392d044-d0f2-491d-a40d-edda4f1361c0");
 
     static final URI MINA_OMBUD_API_TOKEN_URL = URI.create(getConfig("MINA_OMBUD_API_TOKEN_URL",
-        "https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token"));
+        "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token"));
 
     static final URI MINA_OMBUD_API_URL =
         URI.create(getConfig("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v1"));
+
+    static final String MINA_OMBUD_TREDJE_MAN = getConfig("MINA_OMBUD_TREDJE_MAN", "2120000829");
 
     static final String MINA_OMBUD_SAMPLE_SERVICE = getConfig("MINA_OMBUD_SAMPLE_SERVICE", "ApiClientTestIT.java");
     static final String MINA_OMBUD_SAMPLE_ISSUER = getConfig("MINA_OMBUD_SAMPLE_ISSUER", "http://localhost");
@@ -102,7 +104,7 @@ class ApiClientTestIT {
     @Test
     void slutanvandare_kan_soka_behorigheter() {
         var request = new HamtaBehorigheterRequest()
-            .tredjeman("2120000829")
+            .tredjeman(MINA_OMBUD_TREDJE_MAN)
             .fullmaktshavare(new Identitetsbeteckning().id(ssn).typ("pnr"));
         assertThatNoException().isThrownBy(() -> client
             .scope("user:self")
@@ -114,7 +116,7 @@ class ApiClientTestIT {
     @Test
     void system_kan_soka_behorigheter() {
         var request = new HamtaBehorigheterRequest()
-            .tredjeman("2120000829")
+            .tredjeman(MINA_OMBUD_TREDJE_MAN)
             .fullmaktsgivare(new Identitetsbeteckning().id("5561929323").typ("orgnr"))
             .fullmaktshavare(new Identitetsbeteckning().id(ssn).typ("pnr"));
         assertThatNoException().isThrownBy(() -> client

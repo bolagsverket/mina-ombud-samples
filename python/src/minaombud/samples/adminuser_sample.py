@@ -76,7 +76,7 @@ def sample():
     ### 4. Invoke API
     api_url = defaults.MINA_OMBUD_API_URL
     fullmakter_request = {
-        "tredjeman": ["2120000829"],
+        "tredjeman": [defaults.MINA_OMBUD_TREDJE_MAN],
         "fullmaktshavare": {"id": "195004112354", "typ": "pnr"},
         "status": "GILTIG",
         "page": {"page": 0, "size": 100},

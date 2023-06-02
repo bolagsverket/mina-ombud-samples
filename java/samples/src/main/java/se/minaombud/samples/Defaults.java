@@ -32,6 +32,8 @@ public final class Defaults {
 
     public static final Path MINA_OMBUD_SAMPLE_USER_DB;
 
+    public static final String MINA_OMBUD_TREDJE_MAN = getConfig("MINA_OMBUD_TREDJE_MAN", "2120000829");
+
     static {
         var aud = getConfig("MINA_OMBUD_SAMPLE_AUDIENCE", "mina-ombud");
         MINA_OMBUD_SAMPLE_AUDIENCE = Stream.of(aud.split(","))

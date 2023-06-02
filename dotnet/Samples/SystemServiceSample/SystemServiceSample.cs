@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using Jose;
@@ -19,40 +18,7 @@ var authenticatedClient = new HttpClient();
 authenticatedClient.Timeout = Timeout.InfiniteTimeSpan;
 
 ///////////////////////////////////////////////////////////////////////////////
-// 1. User claims
-// These are the values identifying the user.
-
-// Issue and expiry times (2 minutes)
-var iat = DateTimeOffset.Now.ToUnixTimeSeconds();
-var exp = iat + 60 * 2;
-
-const string ssn = "198602262381"; // Social security number
-var userClaims = new Dictionary<string, object>
-{
-    { "sub", Guid.NewGuid().ToString() },
-    { "https://claims.oidc.se/1.0/personalNumber", ssn },
-    { "name", "Beri Ylles" },
-    { "given_name", "Beri" },
-    { "family_name", "Ylles" },
-    { "iat", iat },
-    { "exp", exp },
-    { "iss", "http://localhost" },
-    { "aud", "mina-ombud" },
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// 2. Sign user claims
-///////////////////////////////////////////////////////////////////////////////
-
-// a) Load signing key
-var p12 = new X509Certificate2(Path.Join(defaults.MINA_OMBUD_SAMPLE_DATA, "keys/signing.p12"), "",
-    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
-
-// b) Construct a signed token
-var userToken = JWT.Encode(userClaims, p12.GetRSAPrivateKey(), JwsAlgorithm.RS256);
-
-///////////////////////////////////////////////////////////////////////////////
-// 3. Request API access token.
+// 1. Request API access token.
 // The access token should be requested and reused for subsequent requests
 // until it expires at which point a new token must be requested.
 
@@ -61,19 +27,19 @@ var tokenRequest = new FormUrlEncodedContent(new Dictionary<string, string>
         { "grant_type", "client_credentials" },
         { "client_id", defaults.MINA_OMBUD_API_CLIENT_ID },
         { "client_secret", defaults.MINA_OMBUD_API_CLIENT_SECRET },
-        { "scope", "user:self" }
+        { "scope", "user:any" }
     }
 );
 
 var tokenResponse = await Post<Dictionary<string, object>>(authUrl, tokenRequest);
 var accessToken = tokenResponse["access_token"].ToString();
 authenticatedClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-authenticatedClient.DefaultRequestHeaders.Add("x-id-token", userToken);
 authenticatedClient.DefaultRequestHeaders.Add("x-service-name", "EndUserSample.cs");
 authenticatedClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
 
 ///////////////////////////////////////////////////////////////////////////////
 // 4. Invoke API
+const string ssn = "198602262381"; // Social security number
 var request = new HamtaBehorigheterRequest()
 {
     Tredjeman = defaults.MINA_OMBUD_TREDJE_MAN, // Where the permission is exercised

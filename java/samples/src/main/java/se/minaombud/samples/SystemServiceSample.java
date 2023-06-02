@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static se.minaombud.samples.Defaults.MINA_OMBUD_TREDJE_MAN;
+
 /**
  * Sample API authenticating as an offline service.
  *
@@ -61,7 +63,7 @@ public class SystemServiceSample extends SampleBase {
         ///////////////////////////////////////////////////////////////////////////////
         // 4. Invoke API
         var request = new HamtaBehorigheterRequest()
-            .tredjeman("2120000829") // Where the permission is exercised
+            .tredjeman(MINA_OMBUD_TREDJE_MAN) // Where the permission is exercised
             .fullmaktshavare(new Identitetsbeteckning()
                 .id("198602262381")
                 .typ("pnr"))

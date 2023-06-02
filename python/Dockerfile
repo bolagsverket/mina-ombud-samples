@@ -21,6 +21,8 @@ RUN /venv.dev/bin/pip install $pipargs .[dev]
 COPY tests/ ./tests
 COPY data/ ./data
 RUN /venv.dev/bin/pytest
+RUN /venv.dev/bin/minaombud-sample-adminuser
+RUN /venv.dev/bin/minaombud-sample-enduser
 
 FROM python:3.9-alpine
 ENV PATH=/venv/bin:$PATH \

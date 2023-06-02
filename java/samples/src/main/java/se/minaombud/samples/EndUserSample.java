@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static se.minaombud.samples.Defaults.MINA_OMBUD_SAMPLE_DATA;
+import static se.minaombud.samples.Defaults.MINA_OMBUD_TREDJE_MAN;
+
 /**
  * Sample API authenticating with end user.
  *
@@ -66,7 +69,7 @@ public class EndUserSample extends SampleBase {
         ///////////////////////////////////////////////////////////////////////////////
 
         // a) Load signing key
-        var keys = KeyList.load(Defaults.MINA_OMBUD_SAMPLE_DATA.resolve("keys/signing.p12"), new char[0]);
+        var keys = KeyList.load(MINA_OMBUD_SAMPLE_DATA.resolve("keys/signing.p12"), new char[0]);
 
         // b) Construct a signed token
         var signer = new JwsSigner(keys, JWSAlgorithm.RS256);
@@ -96,7 +99,7 @@ public class EndUserSample extends SampleBase {
         ///////////////////////////////////////////////////////////////////////////////
         // 4. Invoke API
         var request = new HamtaBehorigheterRequest()
-            .tredjeman("2120000829") // Where the permission is exercised
+            .tredjeman(MINA_OMBUD_TREDJE_MAN) // Where the permission is exercised
             .fullmaktshavare(new Identitetsbeteckning()
                 .id(ssn)
                 .typ("pnr"))

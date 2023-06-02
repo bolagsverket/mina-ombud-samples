@@ -1,6 +1,7 @@
 import base64
+import re
 from typing import Union, Optional
-
+from datetime import datetime
 
 def base64_decode_urlsafe(b: Union[str, bytes]) -> bytes:
     if isinstance(b, str):
@@ -26,3 +27,8 @@ def ensure_bytes(s: Optional[Union[str, bytes]], encoding="utf-8") -> Optional[b
     if isinstance(s, str):
         return s.encode(encoding)
     return s
+
+
+def parse_iso_datetime(s: str) -> datetime:
+    s = re.sub(r"([.,]\d+)(Z|[+-]\d{2}:\d{2})?$", lambda m: m.group(1)[:7] + (m.group(2) or ""), s).replace("Z", "+00:00")
+    return datetime.fromisoformat(s)

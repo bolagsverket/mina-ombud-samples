@@ -34,6 +34,8 @@ server = ["waitress", "Paste"]
 [project.scripts]
 minaombud = "minaombud.cli:main"
 minaombud-server = "minaombud.server:main"
+minaombud-sample-adminuser = "minaombud.samples.adminuser_sample:sample"
+minaombud-sample-enduser = "minaombud.samples.enduser_sample:sample"
 
 
 ###

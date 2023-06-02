@@ -20,6 +20,7 @@ from minaombud.crypto import jose
 from minaombud.crypto.jose import JOSEHeader
 from minaombud.crypto.jwkset import JwkSet, RemoteJwkSet
 from minaombud.model import JwsSig
+from minaombud.util import parse_iso_datetime
 
 
 def sample():
@@ -74,7 +75,7 @@ def sample():
     ### 4. Invoke API
     api_url = defaults.MINA_OMBUD_API_URL
     behorigheter_request = {
-        "tredjeman": "2120000829",  # Where the permission is used
+        "tredjeman": defaults.MINA_OMBUD_TREDJE_MAN,  # Where the permission is used
         "fullmaktshavare": {"id": ssn, "typ": "pnr"},  # Holder of the permission
         "fullmaktsgivarroll": ["ORGANISATION"],  # Filter on issuer type
         # "fullmaktsgivare": { "id": "556...", "typ": "orgnr" },# Filter on issuer of permissions
@@ -150,8 +151,8 @@ def sample():
         # f) Check timestamp of permissions.
         #    The tolerance is very application dependent.
         #    Here we accept up to 2 minutes old information.
-        iso_timestamp = kontext["tidpunkt"].replace("Z", "+01:00")
-        timestamp = datetime.fromisoformat(iso_timestamp)
+        iso_timestamp = kontext["tidpunkt"]
+        timestamp = parse_iso_datetime(iso_timestamp)
         now = datetime.now(timestamp.tzinfo)
         delta = now - timestamp
         if delta.total_seconds() > 2 * 60:

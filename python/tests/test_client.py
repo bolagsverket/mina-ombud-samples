@@ -8,7 +8,8 @@ from minaombud.defaults import (
     MINA_OMBUD_SAMPLE_AUDIENCE,
     MINA_OMBUD_SAMPLE_ISSUER,
     MINA_OMBUD_SAMPLE_KEYS,
-    MINA_OMBUD_SAMPLE_USER_DB
+    MINA_OMBUD_SAMPLE_USER_DB,
+    MINA_OMBUD_TREDJE_MAN
 )
 from minaombud.model import Identitetsbeteckning
 from minaombud.user import (
@@ -43,7 +44,7 @@ def new_client():
 def test_sok_fullmakter():
     client = new_client()
     user_token = new_user_token("198602262381")
-    response = client.sok_fullmakter(tredjeman="2120000829",
+    response = client.sok_fullmakter(tredjeman=MINA_OMBUD_TREDJE_MAN,
                                      fullmaktshavare=Identitetsbeteckning.from_id("198602262381"),
                                      user_token=user_token)
     assert isinstance(response.fullmakter, list)
@@ -52,7 +53,7 @@ def test_sok_fullmakter():
 def test_sok_behorigheter():
     client = new_client()
     user_token = new_user_token("198602262381")
-    response = client.sok_behorigheter(tredjeman="2120000829",
+    response = client.sok_behorigheter(tredjeman=MINA_OMBUD_TREDJE_MAN,
                                        fullmaktshavare=Identitetsbeteckning.from_id("198602262381"),
                                        user_token=user_token)
     assert isinstance(response.kontext, list)

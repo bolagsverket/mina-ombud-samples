@@ -53,7 +53,7 @@ def _find_sample_keys():
 
 MINA_OMBUD_API_TOKEN_URL = os.environ.get(
     "MINA_OMBUD_API_TOKEN_URL",
-    "https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token",
+    "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token",
 )
 MINA_OMBUD_API_URL = os.environ.get(
     "MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v1"
@@ -76,6 +76,8 @@ MINA_OMBUD_SAMPLE_KEYS = _find_sample_keys()
 MINA_OMBUD_SAMPLE_USER = os.environ.get("MINA_OMBUD_SAMPLE_USER")
 MINA_OMBUD_SAMPLE_USER_PASSWORD = os.environ.get("MINA_OMBUD_SAMPLE_USER_PASSWORD")
 MINA_OMBUD_SAMPLE_USER_SCOPE = os.environ.get("MINA_OMBUD_SAMPLE_USER_SCOPE", "self")
+
+MINA_OMBUD_TREDJE_MAN = os.environ.get("MINA_OMBUD_TREDJE_MAN", "2120000829")
 
 MINA_OMBUD_SAMPLE_SERVICE = os.environ.get(
     "MINA_OMBUD_SAMPLE_SERVICE", "mina-ombud-sample"

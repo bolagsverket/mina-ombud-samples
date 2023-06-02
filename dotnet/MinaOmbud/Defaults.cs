@@ -9,11 +9,12 @@ public class Defaults
         GetEnv("MINA_OMBUD_API_CLIENT_SECRET", "3392d044-d0f2-491d-a40d-edda4f1361c0");
 
     public string MINA_OMBUD_API_TOKEN_URL = GetEnv("MINA_OMBUD_API_TOKEN_URL",
-        "https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token");
+        "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token");
 
     public string MINA_OMBUD_API_URL =
         GetEnv("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v1");
 
+    public string MINA_OMBUD_TREDJE_MAN = GetEnv("MINA_OMBUD_TREDJE_MAN", "2120000829");
     public string MINA_OMBUD_SAMPLE_SERVICE = GetEnv("MINA_OMBUD_SAMPLE_SERVICE", "mina-ombud-sample");
     public string MINA_OMBUD_SAMPLE_ISSUER = GetEnv("MINA_OMBUD_SAMPLE_ISSUER", "http://localhost");
     public string[] MINA_OMBUD_SAMPLE_AUDIENCE;

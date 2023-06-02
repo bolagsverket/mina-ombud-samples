@@ -44,7 +44,7 @@ from typing import (
 )
 from uuid import UUID
 
-from minaombud.util import base64_decode_urlsafe
+from minaombud.util import base64_decode_urlsafe, parse_iso_datetime
 
 A = TypeVar("A", bound="JSONClass")
 T = TypeVar("T")
@@ -454,9 +454,7 @@ def _decode_scalar(o, types, cls=None, f=None, i=None):
         elif issubclass(t, UUID) and isinstance(o, str):
             return UUID(o)
         elif issubclass(t, datetime) and isinstance(o, str):
-            # datetime only handes microsecond precision and not Z
-            o = re.sub(r"([.,]\d+)Z?$", lambda m: m.group(1)[:7], o).rstrip("Z")
-            return datetime.fromisoformat(o)
+            return parse_iso_datetime(o)
         elif issubclass(t, date) and isinstance(o, str):
             return date.fromisoformat(o)
         elif issubclass(t, (bytes, bytearray)) and isinstance(o, str):
