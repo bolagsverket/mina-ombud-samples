@@ -1,0 +1,44 @@
+#!/bin/sh
+
+SCRIPT=$(readlink -f "$0")
+BASEDIR=$(readlink -f "$(dirname "$SCRIPT")/..")
+if [ -z "$JAVA" ]; then
+    if [ -n "$JAVA_HOME" ]; then
+        JAVA="$JAVA_HOME/bin/java"
+    else
+        JAVA=java
+    fi
+fi
+
+if [ -d "$BASEDIR/target" ]; then
+    CLASSPATH="$BASEDIR/target/samples.jar:$BASEDIR/target/lib/*"
+else
+    CLASSPATH="$BASEDIR/lib/*"
+fi
+
+if [ -z "$MINA_OMBUD_SAMPLE_DATA" ]; then
+    for d in "$BASEDIR/data" "$BASEDIR/../data" "$BASEDIR/../../data"; do
+        if [ -d "$d" ]; then
+            export MINA_OMBUD_SAMPLE_DATA=$(readlink -f "$d")
+            break
+        fi
+    done
+fi
+
+case "$OSTYPE" in
+    cygwin | msys) CLASSPATH=$(cygpath -m -p "$CLASSPATH");;
+esac
+
+main=se.minaombud.samples.cli.CliDriver
+case "$1" in
+    EndUserSample | SystemServiceSample)
+        main=se.minaombud.samples.$1
+        shift
+        ;;
+    se.*)
+        main=se.minaombud.samples.$1
+        shift
+        ;;
+esac
+
+exec "$JAVA" $JAVA_OPTS -cp "$CLASSPATH" "$main" "$@"
