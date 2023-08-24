@@ -13,6 +13,7 @@ public class Json {
 
     static {
         JSON.getDefault().getMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
     }
 
@@ -20,8 +21,7 @@ public class Json {
     /*
         new ObjectMapper()
         .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING)
         .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
