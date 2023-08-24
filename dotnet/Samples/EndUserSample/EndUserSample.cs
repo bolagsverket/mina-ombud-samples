@@ -26,22 +26,15 @@ authenticatedClient.Timeout = Timeout.InfiniteTimeSpan;
 var iat = DateTimeOffset.Now.ToUnixTimeSeconds();
 var exp = iat + 60 * 2;
 
-const string ssn = "198602262381"; // Social security number
-var userClaims = new Dictionary<string, object>
+var userClaims = new Dictionary<string, object>(defaults.MINA_OMBUD_USER_CLAIMS)
 {
-    { "sub", Guid.NewGuid().ToString() },
-    { "https://claims.oidc.se/1.0/personalNumber", ssn },
-    { "name", "Beri Ylles" },
-    { "given_name", "Beri" },
-    { "family_name", "Ylles" },
     { "iat", iat },
-    { "exp", exp },
-    { "iss", "http://localhost" },
-    { "aud", "mina-ombud" },
+    { "exp", exp }
 };
+var ssn = (string)userClaims["https://claims.oidc.se/1.0/personalNumber"]; // Social security number
 
 ///////////////////////////////////////////////////////////////////////////////
-// 2. Sign user claims
+// 2. Sign user claimsl
 ///////////////////////////////////////////////////////////////////////////////
 
 // a) Load signing key
@@ -86,7 +79,7 @@ var request = new HamtaBehorigheterRequest()
     // Behorigheter = new List<string> { "ac94b31e-a17f-11ed-b19d-00155d41fac2" }
 };
 
-var response = await ApiPost<HamtaBehorigheterResponse>($"{apiUrl}/sok/behorigheter", request);
+var response = await ApiPost<HamtaBehorigheterResponse>($"/sok/behorigheter", request);
 Console.WriteLine(PrettyPrint(response));
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,13 +94,14 @@ Console.WriteLine(PrettyPrint(response));
 // This verification should take place in the receiving service.
 foreach (var kontext in response.Kontext)
 {
+    var tredjeman = kontext.Tredjeman;
     var givare = kontext.Fullmaktsgivare;
     var havare = kontext.Fullmaktshavare[0];
     Console.WriteLine($"=== fullmaktsgivare={givare.Namn}, fullmaktshavare={havare.Fornamn} {havare.Namn} ===");
     // a) Fetch key set
     //    In a real implementation the keys would be cached
     //    and only fetched when a new key is used.
-    var keys = await FetchJwkSet(kontext.Tredjeman);
+    var keys = await FetchJwkSet(tredjeman);
 
     // b) Produce the canonical JSON representation of the payload
     //    without the embedded signature.
@@ -149,6 +143,17 @@ foreach (var kontext in response.Kontext)
     {
         Console.WriteLine($"Expired: {timestamp} : {delta}");
     }
+
+    foreach (var b in kontext.Behorigheter)
+    {
+        var fullmaktResponse = await ApiGet<FullmaktMetadataResponse>($"/tredjeman/{tredjeman}/fullmakter/{b.Fullmakt}");
+        payload = JsonCanonicalizer.Serialize(fullmaktResponse, detachSig: true);
+        Console.WriteLine(payload);
+        b64 = Base64Url.Encode(Encoding.UTF8.GetBytes(payload));
+        jws = fullmaktResponse.Sig.Protected + "." + b64 + "." + fullmaktResponse.Sig.Signature;
+        JWT.Decode(jws, pubKey);
+    }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -181,15 +186,20 @@ async Task<T> Post<T>(string uri, HttpContent value)
     return body;
 }
 
-async Task<T> ApiPost<T>(string uri, object value)
+async Task<T> ApiPost<T>(string path, object value)
 {
-    var r = await authenticatedClient.PostAsJsonAsync(uri, value, serializeOptions);
+    var r = await authenticatedClient.PostAsJsonAsync($"{apiUrl}{path}", value, serializeOptions);
     r.EnsureSuccessStatusCode();
     var body = await r.Content.ReadFromJsonAsync<T>(serializeOptions);
     if (body == null)
     {
-        throw new InvalidDataException($"No response body returned from {uri}");
+        throw new InvalidDataException($"No response body returned from {path}");
     }
 
     return body;
+}
+
+async Task<T> ApiGet<T>(string path)
+{
+    return await authenticatedClient.GetFromJsonAsync<T>($"{apiUrl}{path}");
 }

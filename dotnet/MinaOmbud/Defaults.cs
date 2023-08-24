@@ -1,4 +1,7 @@
 ﻿// ReSharper disable All
+
+using System.Text.Json;
+
 namespace MinaOmbud;
 
 public class Defaults
@@ -21,12 +24,39 @@ public class Defaults
 
     public string? MINA_OMBUD_SAMPLE_DATA;
 
+    public Dictionary<string, object> MINA_OMBUD_USER_CLAIMS = new Dictionary<string, object>
+    {
+        { "sub", "4fe3e84f-400f-4459-b4ca-ae0ffdfe3ed2" },
+        { "https://claims.oidc.se/1.0/personalNumber", "198602262381" },
+        { "name", "Beri Ylles" },
+        { "given_name", "Beri" },
+        { "family_name", "Ylles" },
+        { "iss", "http://localhost" },
+        { "aud", "mina-ombud" },
+    };
+
     public Defaults()
     {
         var aud = GetEnv("MINA_OMBUD_SAMPLE_AUDIENCE", "mina-ombud");
         MINA_OMBUD_SAMPLE_AUDIENCE =
             aud.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         MINA_OMBUD_SAMPLE_DATA = findSampleDataFolder();
+
+        var userClaims = GetEnv("MINA_OMBUD_USER_CLAIMS", String.Empty);
+        if (userClaims.Length > 0)
+        {
+            var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(userClaims);
+            foreach (var claim in dict!)
+            {
+                MINA_OMBUD_USER_CLAIMS[claim.Key] = claim.Value;
+            }
+        }
+
+        var pnr = GetEnv("MINA_OMBUD_USER_PNR", String.Empty);
+        if (pnr.Length > 0)
+        {
+            MINA_OMBUD_USER_CLAIMS["https://claims.oidc.se/1.0/personalNumber"] = pnr;
+        }
     }
 
     private static string? findSampleDataFolder()
