@@ -112,6 +112,7 @@ public class UtdeladBehorighet
 {
     public string Kod { get; set; }
     public string Fullmakt { get; set; }
+    [JsonExtensionData] public Dictionary<string, Object>? AdditionalProperties { get; set; }
 }
 
 public class JwsSig
