@@ -111,7 +111,6 @@ public static class FullmaktsgivareRoll
 public class UtdeladBehorighet
 {
     public string Kod { get; set; }
-    public string Typ { get; set; }
     public string Fullmakt { get; set; }
 }
 

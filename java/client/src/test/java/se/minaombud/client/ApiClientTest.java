@@ -51,7 +51,7 @@ class ApiClientTest {
         server.start();
 
         client = new ApiClient(keys)
-            .apiUrl(server.url("/dfm/formedlare/v1").uri())
+            .apiUrl(server.url("/dfm/formedlare/v2").uri())
             .tokenEndpoint(server.url("/token").uri())
             .clientId("client")
             .clientSecret("secret")
@@ -158,7 +158,6 @@ class ApiClientTest {
             .fullmaktshavare(List.of(fullmaktshavare))
             .behorigheter(List.of(new UtdeladBehorighet()
                 .kod("x")
-                .typ("aktiv")
                 .fullmakt(UUID.fromString("f558fdb6-28c2-478e-9f9f-131b0fc9ec46"))));
     }
 

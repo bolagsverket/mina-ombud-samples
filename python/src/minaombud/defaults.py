@@ -1,5 +1,5 @@
+import json
 import os
-
 
 def _locate_sample_data():
     path = os.environ.get("MINA_OMBUD_SAMPLE_DATA")
@@ -56,7 +56,7 @@ MINA_OMBUD_API_TOKEN_URL = os.environ.get(
     "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token",
 )
 MINA_OMBUD_API_URL = os.environ.get(
-    "MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v1"
+    "MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v2"
 )
 
 MINA_OMBUD_API_CLIENT_ID = os.environ.get(
@@ -96,3 +96,25 @@ MINA_OMBUD_SAMPLE_CLIENT_ID = (
     os.environ.get("MINA_OMBUD_SAMPLE_CLIENT_ID") or MINA_OMBUD_SAMPLE_AUDIENCE[0]
 )
 MINA_OMBUD_SAMPLE_CLIENT_SECRET = os.environ.get("MINA_OMBUD_SAMPLE_CLIENT_SECRET")
+
+MINA_OMBUD_USER_CLAIMS = {
+    "sub": "4fe3e84f-400f-4459-b4ca-ae0ffdfe3ed2",
+    "https://claims.oidc.se/1.0/personalNumber": "198602262381",
+    "name": "Beri Ylles",
+    "given_name": "Beri",
+    "family_name": "Ylles",
+    "iss": "http://localhost",
+    "aud": "mina-ombud"
+}
+
+
+def _init_user_claims():
+    claims = os.environ.get("MINA_OMBUD_USER_CLAIMS")
+    if claims:
+        MINA_OMBUD_USER_CLAIMS.update(json.loads(claims))
+    pnr = os.environ.get("MINA_OMBUD_USER_PNR")
+    if pnr:
+        MINA_OMBUD_USER_CLAIMS["https://claims.oidc.se/1.0/personalNumber"] = pnr
+
+
+_init_user_claims()

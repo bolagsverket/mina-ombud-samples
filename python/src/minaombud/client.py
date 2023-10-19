@@ -69,7 +69,7 @@ class MinaOmbudClient:
         client_id: str,
         client_secret: str,
         token_url="https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token",
-        url="https://fullmakt-test.minaombud.se/dfm/formedlare/v1",
+        url="https://fullmakt-test.minaombud.se/dfm/formedlare/v2",
     ):
         self.url = url
         self.scope = frozenset(scope.split(" ") if isinstance(scope, str) else scope)

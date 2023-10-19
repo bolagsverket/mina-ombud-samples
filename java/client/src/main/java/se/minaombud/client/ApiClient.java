@@ -66,7 +66,7 @@ import java.util.stream.Stream;
  * <pre><code>
  * var keys = KeyList.load("keystore.p12"); // If using ApiClient to sign id tokens
  * var client = new ApiClient(keys)
- *   .apiUrl("https://fullmakt-test.minaombud.se/dfm/formedlare/v1")
+ *   .apiUrl("https://fullmakt-test.minaombud.se/dfm/formedlare/v2")
  *   .tokenEndpoint("https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token")
  *   .clientId("my-client-id")
  *   .clientSecret("secret")

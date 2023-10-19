@@ -27,19 +27,10 @@ def sample():
     ### 1. User claims
     iat = int(time.time())  # Time of issue
     exp = iat + 60 * 2      # Expiry time 2 minutes
-    ssn = "198602262381"    # Social security number
-    user_claims = {
-        "https://claims.oidc.se/1.0/personalNumber": ssn,
-        # "https://claims.oidc.se/1.0/coordinationNumber": ssn,
-        "name": "Beri Ylles",
-        "given_name": "Beri",
-        "family_name": "Ylles",
-        "iat": iat,
-        "exp": exp,
-        "iss": "http://localhost",
-        "aud": "mina-ombud",
-        "sub": "9ebe70e4-ca61-11ed-97ed-00155d52ccdb"
-    }
+    user_claims = dict(defaults.MINA_OMBUD_USER_CLAIMS)
+    user_claims["iat"] = iat
+    user_claims["exp"] = exp
+    ssn = user_claims["https://claims.oidc.se/1.0/personalNumber"]
 
     ### 2. Sign claims
     # a) Load signing key

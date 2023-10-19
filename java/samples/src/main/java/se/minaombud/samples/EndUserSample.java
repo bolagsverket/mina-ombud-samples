@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -51,18 +52,12 @@ public class EndUserSample extends SampleBase {
         var iat = Instant.now().getEpochSecond();
         var exp = iat + 60 * 2;
 
-        var ssn = "198602262381"; // Social security number
-        var userClaims = Map.of(
-            "sub", "9ebe70e4-ca61-11ed-97ed-00155d52ccdb",
-            "https://claims.oidc.se/1.0/personalNumber", ssn,
-            "name", "Beri Ylles",
-            "given_name", "Beri",
-            "family_name", "Ylles",
+        var userClaims = new LinkedHashMap<>(Defaults.MINA_OMBUD_USER_CLAIMS);
+        userClaims.putAll(Map.of(
             "iat", iat,
-            "exp", exp,
-            "iss", "http://localhost",
-            "aud", "mina-ombud"
-        );
+            "exp", exp
+        ));
+        var ssn = (String)userClaims.get("https://claims.oidc.se/1.0/personalNumber"); // Social security number
 
         ///////////////////////////////////////////////////////////////////////////////
         // 2. Sign user claims

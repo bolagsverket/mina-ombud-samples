@@ -605,7 +605,7 @@
 		},
 		{
 			"key": "api_url",
-			"value": "{{api_host}}/dfm/formedlare/v1",
+			"value": "{{api_host}}/dfm/formedlare/v2",
 			"type": "string"
 		},
 		{

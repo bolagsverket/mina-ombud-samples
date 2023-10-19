@@ -28,7 +28,7 @@ class ApiClientTestIT {
         "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token"));
 
     static final URI MINA_OMBUD_API_URL =
-        URI.create(getConfig("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v1"));
+        URI.create(getConfig("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v2"));
 
     static final String MINA_OMBUD_TREDJE_MAN = getConfig("MINA_OMBUD_TREDJE_MAN", "2120000829");
 

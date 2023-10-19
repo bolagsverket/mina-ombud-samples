@@ -15,11 +15,6 @@ class Identitetstyp(Enum):
     USERNAME = "username"
 
 
-class Behorighetstyp(Enum):
-    AKTIV = "aktiv"
-    PASSIV = "passiv"
-
-
 class FullmaktsgivareRoll(Enum):
     PRIVAT = "PRIVAT"
     ORGANISATION = "ORGANISATION"
@@ -115,7 +110,6 @@ class JwsSig(JSONClass):
 @dataclass
 class UtdeladBehorighet(JSONClass):
     kod: str
-    typ: Behorighetstyp
     fullmakt: str
 
 
@@ -267,22 +261,10 @@ class FullmaktSignatar(JSONClass):
 
 
 @dataclass
-class BehorighetTyp(JSONClass):
-    typ: str
-    rubrik: Optional[str] = None
-    beskrivning: Optional[str] = None
-
-
-@dataclass
 class Behorighetsobjekt(JSONClass):
     kod: str
-    typer: Sequence[BehorighetTyp]
-    rubrik: Optional[str] = None
-
-
-@dataclass
-class Behorighet(JSONClass):
-    behorighetsobjekt: Behorighetsobjekt
+    rubrik: str
+    beskrivning: Optional[str] = None
 
 
 @dataclass
@@ -297,7 +279,7 @@ class Fullmakt(JSONClass):
     fullmaktsgivarroll: FullmaktsgivareRoll
     fullmaktshavare: Sequence[Fullmaktshavare]
     signatarer: Sequence[FullmaktSignatar]
-    behorigheter: Sequence[Behorighet]
+    behorigheter: Sequence[Behorighetsobjekt]
     giltig_from: date
     transportfullmakt: bool = False
     giltig_tom: Optional[date] = None

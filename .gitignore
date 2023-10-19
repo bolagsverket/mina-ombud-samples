@@ -7,4 +7,5 @@ target/
 .classpath
 
 dist/
+out/
 venv/

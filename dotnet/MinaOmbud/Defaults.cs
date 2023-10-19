@@ -15,7 +15,7 @@ public class Defaults
         "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token");
 
     public string MINA_OMBUD_API_URL =
-        GetEnv("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v1");
+        GetEnv("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v2");
 
     public string MINA_OMBUD_TREDJE_MAN = GetEnv("MINA_OMBUD_TREDJE_MAN", "2120000829");
     public string MINA_OMBUD_SAMPLE_SERVICE = GetEnv("MINA_OMBUD_SAMPLE_SERVICE", "mina-ombud-sample");

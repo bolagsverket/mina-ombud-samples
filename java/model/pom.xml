@@ -45,7 +45,8 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://static-test.minaombud.se/openapi/dfm_konsument_v1.yaml</inputSpec>
+<!--                            <inputSpec>https://static-test.minaombud.se/openapi/dfm_konsument_v1.yaml</inputSpec>-->
+                            <inputSpec>https://static.minaombud.se/openapi/dfm_konsument_v2.yaml</inputSpec>
                             <ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
                             <templateDirectory>${project.basedir}/openapi-templates</templateDirectory>
                             <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>

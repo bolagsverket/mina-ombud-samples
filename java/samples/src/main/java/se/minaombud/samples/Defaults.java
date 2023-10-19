@@ -1,5 +1,7 @@
 package se.minaombud.samples;
 
+import se.minaombud.json.Json;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -7,7 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,7 +26,7 @@ public final class Defaults {
         "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token"));
 
     public static final URI MINA_OMBUD_API_URL =
-        URI.create(getConfig("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v1"));
+        URI.create(getConfig("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v2"));
 
     public static final String MINA_OMBUD_SAMPLE_SERVICE = getConfig("MINA_OMBUD_SAMPLE_SERVICE", "mina-ombud-sample");
     public static final String MINA_OMBUD_SAMPLE_ISSUER = getConfig("MINA_OMBUD_SAMPLE_ISSUER", "http://localhost");
@@ -33,6 +37,16 @@ public final class Defaults {
     public static final Path MINA_OMBUD_SAMPLE_USER_DB;
 
     public static final String MINA_OMBUD_TREDJE_MAN = getConfig("MINA_OMBUD_TREDJE_MAN", "2120000829");
+
+    public static Map<String, Object> MINA_OMBUD_USER_CLAIMS = new LinkedHashMap<>(Map.of(
+        "sub", "9ebe70e4-ca61-11ed-97ed-00155d52ccdb",
+        "https://claims.oidc.se/1.0/personalNumber", "198602262381",
+        "name", "Beri Ylles",
+        "given_name", "Beri",
+        "family_name", "Ylles",
+        "iss", "http://localhost",
+        "aud", "mina-ombud"
+    ));
 
     static {
         var aud = getConfig("MINA_OMBUD_SAMPLE_AUDIENCE", "mina-ombud");
@@ -47,6 +61,18 @@ public final class Defaults {
         }
         MINA_OMBUD_SAMPLE_DATA = dataPath;
         MINA_OMBUD_SAMPLE_USER_DB = findSampleUsers();
+
+        var userClaims = getConfig("MINA_OMBUD_USER_CLAIMS", "");
+        if (!userClaims.isEmpty()) {
+            var claims = new Json().parseJsonObject(userClaims);
+            MINA_OMBUD_USER_CLAIMS.putAll(claims);
+        }
+
+        var pnr = getConfig("MINA_OMBUD_USER_PNR", "");
+        if (!pnr.isEmpty()) {
+            MINA_OMBUD_USER_CLAIMS.put("https://claims.oidc.se/1.0/personalNumber", pnr.replace("-", ""));
+        }
+
     }
 
     private static String getConfig(String name, String defaultValue) {
