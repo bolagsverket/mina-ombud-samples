@@ -1,5 +1,6 @@
 Import-Module $PSScriptRoot/MinaOmbud.psm1
 
+$ErrorActionPreference = 'Stop'
 #$PSDefaultParameterValues['Get-MinaOmbudConfig:Debug']=$true
 
 $Ssn = Get-MinaOmbudConfig SampleUser
