@@ -12,7 +12,8 @@ Exempel finns för
 
 För att anropa ett API krävs följande:
 - Ett namn för anropande tjänst (`X-Service-Name: myservice`).
-  Bör vara samma service-namn som i SSBT om SSBT också används.
+  Bör vara samma service-namn som i SSBT om SSBT också används. 
+  X-Service-Name får bara innehålla tecknen [a-zA-Z0-9._-].
 - En access-token för API:et (`Authorization: Bearer <ACCESS_TOKEN>`)
 - En signerad id-token (JWS) med information om slutanvändaren
   (`X-Id-Token: <ID_TOKEN>`).
