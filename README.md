@@ -153,8 +153,6 @@ Följande krav finns på nycklar för verifiering av signaturer
 - Den publika nyckeln ska publiceras med tillhörande X.509-certifikat
   som ett JSON Web Key Set enligt [RFC 7517](https://www.rfc-editor.org/rfc/rfc7517#section-5)
   åtkomligt för Mina ombud.
-- Certifikat ska utfärdas av en betrodd utfärdare  
-  (t.ex. Stämpellegitimation från Expisoft AB).
 - Attributet `x5c` ska inkludera certifikatet och eventuell certifikatskedja.
 - Attributet `x5t#S256` ska anges.
 - Nycklar ska identifieras med Key ID (attributet `kid`) som t.ex.
@@ -177,7 +175,8 @@ Följande krav finns på den JWS som innehåller användarinformation
   med Mina ombud för att kunna verifieras.
 - Claims ska ha separata issuer (`iss`) och audience (`aud`)
   om någon typ av testautentisering används (t.ex. BankID för test)
-  jämfört med värden för skarp autentisering.
+  jämfört med värden för skarp autentisering. Detta för att mimimera
+  datapåverkan i händelse att fel miljö konfigureras.
 - Attributet `azp` ska finnas om `aud` innehåller flera värden.
 - Attributen `iat` och `exp` bör anges för att begränsa informationens
   livslängd och hur länge en exponerad token kan brukas.
