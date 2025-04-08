@@ -201,5 +201,10 @@ async Task<T> ApiPost<T>(string path, object value)
 
 async Task<T> ApiGet<T>(string path)
 {
-    return await authenticatedClient.GetFromJsonAsync<T>($"{apiUrl}{path}");
+    var result = await authenticatedClient.GetFromJsonAsync<T>($"{apiUrl}{path}");
+    if (result == null)
+    {
+        throw new InvalidDataException($"No response body returned from {path}");
+    }
+    return result;
 }
