@@ -56,7 +56,7 @@ Tiden när token går ut kan beräknas från tid för token request och attribut
 
 Mina ombud kräver en signerad JWT med information om slutanvändaren (se [RFC 7515](https://www.rfc-editor.org/rfc/rfc7515)).
 
-Claims som följer [OIDC Swedens draft](https://github.com/oidc-sweden/specifications/blob/main/swedish-oidc-attribute-specification.md#attributes-and-claims)
+Claims som följer [Swedish OpenID Connect Profile](https://github.com/oidc-sweden/specifications/blob/main/swedish-oidc-claims-specification.md#21-user-identity-claims)
 ska användas för att identifiera användaren.
 
 Se [pseudo-kod](#signeringsexempel), [enduser_sample.py](python/src/minaombud/samples/enduser_sample.py)
@@ -191,9 +191,11 @@ Följande krav finns på den JWS som innehåller användarinformation
 - Attributet `sub` ska finnas.
 
 Om ett autentiseringssystem redan finns som använder
-OpenID Connect och följer [OIDC Swedens v1.0](https://github.com/oidc-sweden/specifications/blob/release/1.0-release/swedish-oidc-claims-specification.md#user-content-2-claims)
+OpenID Connect och följer [Swedish OpenID Connect Profile](https://github.com/oidc-sweden/specifications/blob/main/swedish-oidc-claims-specification.md#21-user-identity-claims)
 så kan ID-token användas direkt med Mina ombud förutsatt att den publika
 nyckeln för att verifiera signaturen är tillgänglig för Mina ombud.
+
+Tidigare utkast av specifikationen accepteras också tillsvidare (t.ex. `https://claims.oidc.se/1.0/personalNumber`).
 
 ### Signeringsexempel 
 För att signera informationen rekommenderas ett beprövat bibliotek
