@@ -1,7 +1,6 @@
 package se.minaombud.samples;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import se.minaombud.json.Json;
+import static se.minaombud.json.Json.DEFAULT_MAPPER;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static se.minaombud.json.Json.DEFAULT_MAPPER;
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import se.minaombud.json.Json;
 
 public final class Users {
 
@@ -22,8 +23,8 @@ public final class Users {
     };
 
     private static final String[] ID_CLAIMS = {
-        "https://claims.oidc.se/1.0/personalNumber",
-        "https://claims.oidc.se/1.0/coordinationNumber",
+        "https://id.oidc.se/claim/personalIdentityNumber",
+        "https://id.oidc.se/claim/coordinationNumber",
         "preferred_username",
         "sub"
     };
@@ -80,9 +81,9 @@ public final class Users {
             String typ = parts[1];
             var claims = new LinkedHashMap<String, Object>();
             if ("pnr".equals(typ)) {
-                claims.put("https://claims.oidc.se/1.0/personalNumber", id);
+                claims.put("https://id.oidc.se/claim/personalIdentityNumber", id);
             } else if ("samnr".equals(typ)) {
-                claims.put("https://claims.oidc.se/1.0/coordinationNumber", id);
+                claims.put("https://id.oidc.se/claim/coordinationNumber", id);
             } else {
                 claims.put("sub", id);
             }
@@ -107,9 +108,9 @@ public final class Users {
                 String id = userSpec.replace("-", "");
                 String typ = Users.classifyNationalIdentity(id);
                 if ("pnr".equals(typ)) {
-                    claims.put("https://claims.oidc.se/1.0/personalNumber", id);
+                    claims.put("https://id.oidc.se/claim/personalIdentityNumber", id);
                 } else if ("samnr".equals(typ)) {
-                    claims.put("https://claims.oidc.se/1.0/coordinationNumber", id);
+                    claims.put("https://id.oidc.se/claim/coordinationNumber", id);
                 } else {
                     claims.put("sub", id);
                 }

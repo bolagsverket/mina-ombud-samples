@@ -1,21 +1,5 @@
 package se.minaombud.client;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import se.minaombud.crypto.JwsSigner;
-import se.minaombud.crypto.JwsVerifier;
-import se.minaombud.crypto.KeyList;
-import se.minaombud.crypto.SignatureVerificationException;
-import se.minaombud.json.Json;
-import se.minaombud.model.Behorighetskontext;
-import se.minaombud.model.FullmaktMetadataResponse;
-import se.minaombud.model.HamtaBehorigheterRequest;
-import se.minaombud.model.HamtaBehorigheterResponse;
-import se.minaombud.model.HamtaFullmakterRequest;
-import se.minaombud.model.HamtaFullmakterResponse;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,6 +12,7 @@ import java.net.http.HttpResponse.BodySubscribers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,6 +28,26 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+
+import se.minaombud.crypto.JwsSigner;
+import se.minaombud.crypto.JwsVerifier;
+import se.minaombud.crypto.KeyList;
+import se.minaombud.crypto.SignatureVerificationException;
+import se.minaombud.json.Json;
+import se.minaombud.model.ArkiveringRaderingResponse;
+import se.minaombud.model.ArkiveringsinformationResponse;
+import se.minaombud.model.Behorighetskontext;
+import se.minaombud.model.FullmaktMetadataResponse;
+import se.minaombud.model.HamtaBehorigheterRequest;
+import se.minaombud.model.HamtaBehorigheterResponse;
+import se.minaombud.model.HamtaFullmakterRequest;
+import se.minaombud.model.HamtaFullmakterResponse;
 
 /**
  * Sample API client.
@@ -67,7 +72,7 @@ import java.util.stream.Stream;
  * var keys = KeyList.load("keystore.p12"); // If using ApiClient to sign id tokens
  * var client = new ApiClient(keys)
  *   .apiUrl("https://fullmakt-test.minaombud.se/dfm/formedlare/v2")
- *   .tokenEndpoint("https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token")
+ *   .tokenEndpoint("https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token")
  *   .clientId("my-client-id")
  *   .clientSecret("secret")
  *   .scope("user:self")
@@ -75,7 +80,7 @@ import java.util.stream.Stream;
  *   .issuer("my-registered-issuer");
  * var idToken = client.signJwt(Map.of(
  *      "sub", "...",
- *      "https://claims.oidc.se/1.0/personalNumber", "...",
+ *      "https://id.oidc.se/claim/personalIdentityNumber", "...",
  *      "given_name", "Test",
  *      "family_name", "Persson",
  *      "name": "Test Persson")); // If using ApiClient to sign id tokens
@@ -452,7 +457,7 @@ public class ApiClient {
         }
 
         /**
-         * General POST request
+         * General GET request
          *
          * @param type type of response (use {@code Void.class} if no response is expected)
          * @return this
@@ -463,6 +468,14 @@ public class ApiClient {
 
         public <T> CompletableFuture<T> getAsync(Class<T> type) {
             return requestAsync(type, "GET", null);
+        }
+
+        private <T> T delete(Class<T> type) {
+            return request(type, "DELETE", type);
+        }
+
+        private <T> CompletableFuture<T> deleteAsync(Class<T> type) {
+            return requestAsync(type, "DELETE", type);
         }
 
         /**
@@ -532,6 +545,72 @@ public class ApiClient {
                 .getAsync(FullmaktMetadataResponse.class)
                 .thenApply(f -> verifySignature(tredjemanId, fullmaktId, f));
         }
+
+        /**
+         * List packages for archiving.
+         *
+         * @return list of packages
+         * @see #hamtaArkivpaket(String, UUID)
+         */
+        public ArkiveringsinformationResponse listaArkivpaket(String tredjemanId, int page, int pageSize) {
+            return path("/tredjeman/{tredjemanId}/arkivering/paket?page={page}&size={pageSize}", tredjemanId, page, pageSize)
+                .get(ArkiveringsinformationResponse.class);
+        }
+
+        /**
+         * List packages for archiving.
+         *
+         * @return list of packages
+         * @see #hamtaArkivpaketAsync(String, UUID)
+         */
+        public CompletableFuture<ArkiveringsinformationResponse> listaArkivpaketAsync(String tredjemanId, int page, int pageSize) {
+            return path("/tredjeman/{tredjemanId}/arkivering/paket?page={page}&size={pageSize}", tredjemanId, page, pageSize)
+                .getAsync(ArkiveringsinformationResponse.class);
+        }
+
+        /**
+         * Get archive package.
+         *
+         * @return zip file
+         * @see #hamtaArkivpaketAsync(String, UUID)
+         * @see #raderaArkivpaket(String, UUID)
+         */
+        public byte[] hamtaArkivpaket(String tredjemanId, UUID paketId) {
+            return path("/tredjeman/{tredjemanId}/arkivering/paket/{paketId}", tredjemanId, paketId)
+                .header("accept", "application/zip")
+                .get(byte[].class);
+        }
+
+        /**
+         * Get archive package.
+         *
+         * @return zip file
+         */
+        public CompletableFuture<byte[]> hamtaArkivpaketAsync(String tredjemanId, UUID paketId) {
+            return path("/tredjeman/{tredjemanId}/arkivering/paket/{paketId}", tredjemanId, paketId)
+                .header("accept", "application/zip")
+                .getAsync(byte[].class);
+        }
+
+        /**
+         * Remove archive package.
+         *
+         * @see #raderaArkivpaketAsync(String, UUID)
+         */
+        public ArkiveringRaderingResponse raderaArkivpaket(String tredjemanId, UUID paketId) {
+            return path("/tredjeman/{tredjemanId}/arkivering/paket/{paketId}", tredjemanId, paketId)
+                .delete(ArkiveringRaderingResponse.class);
+        }
+
+        /**
+         * Remove archive package.
+         *
+         * @see #raderaArkivpaket(String, UUID)
+         */
+        public CompletableFuture<ArkiveringRaderingResponse> raderaArkivpaketAsync(String tredjemanId, UUID paketId) {
+            return path("/tredjeman/{tredjemanId}/arkivering/paket/{paketId}", tredjemanId, paketId)
+                .deleteAsync(ArkiveringRaderingResponse.class);
+        }
     }
 
     public ApiClient user(Map<String, Object> user) {
@@ -590,7 +669,7 @@ public class ApiClient {
         }
     }
 
-    <T> HttpResponse<T> doRequest(RequestContext<T> context,
+    private <T> HttpResponse<T> doRequest(RequestContext<T> context,
                                   BiFunction<RequestContext<T>, String, RuntimeException> errorFilter) {
         var request = context.request;
         try {
@@ -610,14 +689,52 @@ public class ApiClient {
         }
     }
 
-    <T> CompletableFuture<HttpResponse<T>> doRequestAsync(RequestContext<T> context,
+    private <T> CompletableFuture<HttpResponse<T>> doRequestAsync(RequestContext<T> context,
                                                           BiFunction<RequestContext<T>, String, RuntimeException> errorFilter) {
-        var request = context.request;
-        logRequest(context);
-        return client.sendAsync(request, bodyHandler(context, errorFilter));
+        return doRequestAsync(context, bodyHandler(context, errorFilter));
     }
 
-    <T> HttpResponse.BodyHandler<T> bodyHandler(RequestContext<T> context,
+    private <T> CompletableFuture<HttpResponse<T>> doRequestAsync(RequestContext<T> context, HttpResponse.BodyHandler<T> bodyHandler) {
+        var request = context.request;
+        logRequest(context);
+        return client.sendAsync(request, bodyHandler);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> HttpResponse.BodyHandler<T> bodyHandler(RequestContext<T> context,
+                                                BiFunction<RequestContext<T>, String, RuntimeException> errorFilter) {
+        if (context.type == byte[].class) {
+            return (HttpResponse.BodyHandler<T>)byteArrayBodyHandler(
+                (RequestContext<byte[]>)context,
+                (BiFunction<RequestContext<byte[]>, String, RuntimeException>)(BiFunction<?, String, RuntimeException>)errorFilter);
+        } else {
+            return jsonBodyHandler(context, errorFilter);
+        }
+    }
+
+    private static HttpResponse.BodyHandler<byte[]> byteArrayBodyHandler(RequestContext<byte[]> context,
+                                                      BiFunction<RequestContext<byte[]>, String, RuntimeException> errorFilter) {
+        return responseInfo -> {
+            context.response = responseInfo;
+            return BodySubscribers.mapping(BodySubscribers.ofByteArray(), bytes -> {
+                String contentType = responseInfo.headers().firstValue("content-type").orElse(null);
+                String text = "application/json".equals(contentType)
+                    ? new String(bytes, StandardCharsets.UTF_8)
+                    : (responseInfo.statusCode() >= 400 ? Base64.getEncoder().encodeToString(bytes) : "");
+                logResponse(context, text);
+                if (responseInfo.statusCode() >= 400) {
+                    Optional.ofNullable(errorFilter.apply(context, text))
+                        .ifPresent(error -> {
+                            throw error;
+                        });
+                }
+                return bytes;
+            });
+        };
+
+    }
+
+    private <T> HttpResponse.BodyHandler<T> jsonBodyHandler(RequestContext<T> context,
                                                 BiFunction<RequestContext<T>, String, RuntimeException> errorFilter) {
         var sub = BodySubscribers.ofString(StandardCharsets.UTF_8);
         return responseInfo -> {

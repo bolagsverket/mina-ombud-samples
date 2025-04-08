@@ -200,6 +200,11 @@ function Format-Json([Parameter(Mandatory)][string] $json) {
 
 function ConvertTo-PrettyJson([Parameter(Mandatory, ValueFromPipeline)][object] $obj)
 {
+    if ($obj -is [string])
+    {
+        $obj = ConvertFrom-Json $obj
+    }
+
     $json = ConvertTo-Json -Depth 100 $obj
     if ($PSVersionTable.PSVersion.Major -ge 6)
     {

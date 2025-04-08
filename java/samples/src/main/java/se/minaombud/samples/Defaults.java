@@ -1,7 +1,5 @@
 package se.minaombud.samples;
 
-import se.minaombud.json.Json;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -16,6 +14,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import se.minaombud.json.Json;
+
 public final class Defaults {
     public static final String MINA_OMBUD_API_CLIENT_ID = getConfig("MINA_OMBUD_API_CLIENT_ID", "mina-ombud-sample");
 
@@ -26,7 +26,11 @@ public final class Defaults {
         "https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token"));
 
     public static final URI MINA_OMBUD_API_URL =
-        URI.create(getConfig("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v2"));
+            URI.create(getConfig("MINA_OMBUD_API_URL", "https://fullmakt-test.minaombud.se/dfm/formedlare/v2"));
+
+    public static final URI MINA_OMBUD_STATIC_URL =
+            URI.create(getConfig("MINA_OMBUD_STATIC_URL", "https://static.minaombud.se"));
+
 
     public static final String MINA_OMBUD_SAMPLE_SERVICE = getConfig("MINA_OMBUD_SAMPLE_SERVICE", "mina-ombud-sample");
     public static final String MINA_OMBUD_SAMPLE_ISSUER = getConfig("MINA_OMBUD_SAMPLE_ISSUER", "http://localhost");
@@ -40,7 +44,7 @@ public final class Defaults {
 
     public static Map<String, Object> MINA_OMBUD_USER_CLAIMS = new LinkedHashMap<>(Map.of(
         "sub", "9ebe70e4-ca61-11ed-97ed-00155d52ccdb",
-        "https://claims.oidc.se/1.0/personalNumber", "198602262381",
+        "https://id.oidc.se/claim/personalIdentityNumber", "198602262381",
         "name", "Beri Ylles",
         "given_name", "Beri",
         "family_name", "Ylles",
@@ -70,7 +74,7 @@ public final class Defaults {
 
         var pnr = getConfig("MINA_OMBUD_USER_PNR", "");
         if (!pnr.isEmpty()) {
-            MINA_OMBUD_USER_CLAIMS.put("https://claims.oidc.se/1.0/personalNumber", pnr.replace("-", ""));
+            MINA_OMBUD_USER_CLAIMS.put("https://id.oidc.se/claim/personalIdentityNumber", pnr.replace("-", ""));
         }
 
     }

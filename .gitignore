@@ -6,6 +6,14 @@ target/
 .project
 .classpath
 
+.cache/
+.dotnet/
+.local/
+.m2/
+.nuget/
+.venv/
+
+archive/
 dist/
 out/
 venv/

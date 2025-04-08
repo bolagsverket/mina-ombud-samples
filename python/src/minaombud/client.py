@@ -17,6 +17,8 @@ from minaombud.model import (
     HamtaBehorigheterResponse,
     ApiError,
     ApiException,
+    Arkiveringspaket,
+    ArkiveringsinformationResponse,
     HamtaFullmakterRequest,
     HamtaFullmakterResponse,
     FullmaktStatus,
@@ -47,6 +49,10 @@ def _parse_api_response(cls: Type[A], response: Response) -> A:
     if response.ok:
         return cls.from_json(response.content)
 
+    _handle_api_error(response)
+
+
+def _handle_api_error(response: Response):
     content_type, _ = cgi.parse_header(response.headers.get("content-type", ""))
     if content_type.lower() == "application/json":
         obj = response.json()
@@ -68,7 +74,7 @@ class MinaOmbudClient:
         scope: Union[str, Iterable[str]],
         client_id: str,
         client_secret: str,
-        token_url="https://auth-accept.minaombud.se/auth/realms/dfm/protocol/openid-connect/token",
+        token_url="https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token",
         url="https://fullmakt-test.minaombud.se/dfm/formedlare/v2",
     ):
         self.url = url
@@ -216,7 +222,6 @@ class MinaOmbudClient:
         page: Optional[int] = None,
         page_size: Optional[int] = None,
     ) -> HamtaFullmakterResponse:
-
         if isinstance(tredjeman, str):
             tredjeman = [tredjeman]
 
@@ -258,7 +263,6 @@ class MinaOmbudClient:
         *,
         user_token: Optional[str] = None,
     ) -> FullmaktMetadataResponse:
-
         response = self._get(
             FullmaktMetadataResponse,
             f"/tredjeman/{tredjeman}/fullmakter/{fullmaktsid}",
@@ -267,3 +271,17 @@ class MinaOmbudClient:
         if not verify_embedded_jws(response, self.get_jwk_set(tredjeman)):
             raise ValueError(f"Ogiltig signatur för fullmakt {tredjeman} {fullmaktsid}")
         return response
+
+    def lista_arkivpaket(self, tredjeman: str) -> ArkiveringsinformationResponse:
+        return self._get(ArkiveringsinformationResponse, f"/tredjeman/{tredjeman}/arkivering/paket")
+
+    def hamta_arkivpaket(self, tredjeman: str, paket_id: Union[UUID, str]) -> bytes:
+        path = f"/tredjeman/{tredjeman}/arkivering/paket/{paket_id}"
+        headers = {
+            "accept": "application/zip"
+        }
+        response = self.session.get(f"{self.url}{path}", headers=headers)
+        if response.ok:
+            return response.content
+
+        _handle_api_error(response)

@@ -11,11 +11,7 @@
 
     <artifactId>samples</artifactId>
     <packaging>jar</packaging>
-
     <name>${project.artifactId}</name>
-
-    <properties>
-    </properties>
 
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -25,7 +21,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -76,31 +72,18 @@
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>EndUserSample</id>
                         <goals>
-                            <goal>java</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
-                        <phase>verify</phase>
-                        <configuration>
-                            <mainClass>se.minaombud.samples.EndUserSample</mainClass>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>SystemServiceSample</id>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <phase>verify</phase>
-                        <configuration>
-                            <mainClass>se.minaombud.samples.SystemServiceSample</mainClass>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
@@ -121,6 +104,17 @@
             <artifactId>slf4j-simple</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

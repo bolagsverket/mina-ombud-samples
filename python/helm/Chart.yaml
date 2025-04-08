@@ -1,6 +1,0 @@
-apiVersion: v2
-name: mina-ombud-python-server
-description: Key and auth sample server for Mina ombud
-type: application
-version: 0.1.0
-appVersion: latest

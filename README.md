@@ -26,7 +26,7 @@ För att anropa ett API krävs följande:
 
 Token request
 ```http request
-POST /auth/realms/dfm/protocol/openid-connect/token HTTP/1.1
+POST /auth/realms/dfm-accept2/protocol/openid-connect/token HTTP/1.1
 Authorization: Basic base64(client_id:client_secret)
 Content-Type: application/x-www-form-urlencoded
 
@@ -180,9 +180,9 @@ Följande krav finns på den JWS som innehåller användarinformation
 - Attributet `azp` ska finnas om `aud` innehåller flera värden.
 - Attributen `iat` och `exp` bör anges för att begränsa informationens
   livslängd och hur länge en exponerad token kan brukas.
-- Attributet `https://claims.oidc.se/1.0/personalNumber` ska sättas
+- Attributet `https://id.oidc.se/claim/personalIdentityNumber` ska sättas
   till personnummer vid identifiering av part i fullmakt.
-- Attributet `https://claims.oidc.se/1.0/coordinationNumber` ska sättas
+- Attributet `https://id.oidc.se/claim/coordinationNumber` ska sättas
   till samordningsnummer vid identifiering av part i fullmakt.
 - Attributet `preferred_username` ska sättas för användare
   som inte identifieras med person- eller samordningsnummer
@@ -191,7 +191,7 @@ Följande krav finns på den JWS som innehåller användarinformation
 - Attributet `sub` ska finnas.
 
 Om ett autentiseringssystem redan finns som använder
-OpenID Connect och följer [OIDC Swedens draft](https://github.com/oidc-sweden/specifications/blob/main/swedish-oidc-attribute-specification.md#attributes-and-claims)
+OpenID Connect och följer [OIDC Swedens v1.0](https://github.com/oidc-sweden/specifications/blob/release/1.0-release/swedish-oidc-claims-specification.md#user-content-2-claims)
 så kan ID-token användas direkt med Mina ombud förutsatt att den publika
 nyckeln för att verifiera signaturen är tillgänglig för Mina ombud.
 
@@ -255,7 +255,7 @@ function get_signing_key() {
 }
 const jwk = get_signing_key()
 const user_token = sign_claims({
-  "https://claims.oidc.se/1.0/personalNumber": "198602262381",
+  "https://id.oidc.se/claim/personalIdentityNumber": "198602262381",
   "name": "Beri Ylles",
   "given_name": "Beri",
   "family_name": "Ylles",

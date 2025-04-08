@@ -31,7 +31,7 @@ def sample():
     exp = iat + 60 * 2      # Expiry time 2 minutes
     user_claims = {
         "preferred_username": "casey",
-        "https://claims.oidc.se/1.0/personalNumber": "200001152388",
+        "https://id.oidc.se/claim/personalIdentityNumber": "200001152388",
         "name": "Case Handler",
         "given_name": "Case",
         "family_name": "Handler",
@@ -46,10 +46,9 @@ def sample():
     # a) Load signing key
     key_set = JwkSet.load(defaults.MINA_OMBUD_SAMPLE_KEYS)
     try:
-        key = next(k for k in key_set.private_keys)
-        assert key.kty == "RSA"
+        key = next(k for k in key_set.private_keys if k.kty == "RSA")
     except StopIteration:
-        raise KeyError("No private key found")
+        raise KeyError("No RSA private key found")
 
     # b) Sign claims to get a JWS using compact serialization
     header = JOSEHeader(alg="RS256", kid=key.kid)
@@ -69,9 +68,7 @@ def sample():
     }
     request_time = time.time()
     token_response = requests.post(token_url, token_request).json()
-    assert token_response["token_type"] == "Bearer"
     access_token = token_response["access_token"]
-    token_expires_at = request_time + token_response["expires_in"]
 
     ### 4. Invoke API
     api_url = defaults.MINA_OMBUD_API_URL

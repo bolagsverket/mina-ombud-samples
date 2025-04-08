@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "minaombud"
-version = "0.1.6"
+version = "0.1.8"
 authors = [ { name = "Bolagsverket" } ]
 requires-python = ">=3.8"
 description = "Mina ombud sample integration"
@@ -35,6 +35,7 @@ server = ["waitress", "Paste"]
 minaombud = "minaombud.cli:main"
 minaombud-server = "minaombud.server:main"
 minaombud-sample-adminuser = "minaombud.samples.adminuser_sample:sample"
+minaombud-sample-arkivering = "minaombud.samples.arkivering_sample:sample"
 minaombud-sample-enduser = "minaombud.samples.enduser_sample:sample"
 
 

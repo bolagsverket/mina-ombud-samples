@@ -1,15 +1,7 @@
 package se.minaombud.samples;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import se.minaombud.client.TokenResponse;
-import se.minaombud.crypto.JwsSigner;
-import se.minaombud.crypto.KeyList;
-import se.minaombud.model.FullmaktMetadataResponse;
-import se.minaombud.model.FullmaktsgivareRoll;
-import se.minaombud.model.HamtaBehorigheterRequest;
-import se.minaombud.model.HamtaBehorigheterResponse;
-import se.minaombud.model.Identitetsbeteckning;
-import se.minaombud.model.PageParameters;
+import static se.minaombud.samples.Defaults.MINA_OMBUD_SAMPLE_DATA;
+import static se.minaombud.samples.Defaults.MINA_OMBUD_TREDJE_MAN;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -21,11 +13,20 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static se.minaombud.samples.Defaults.MINA_OMBUD_SAMPLE_DATA;
-import static se.minaombud.samples.Defaults.MINA_OMBUD_TREDJE_MAN;
+import com.nimbusds.jose.JWSAlgorithm;
+
+import se.minaombud.client.TokenResponse;
+import se.minaombud.crypto.JwsSigner;
+import se.minaombud.crypto.KeyList;
+import se.minaombud.model.FullmaktMetadataResponse;
+import se.minaombud.model.FullmaktsgivareRoll;
+import se.minaombud.model.HamtaBehorigheterRequest;
+import se.minaombud.model.HamtaBehorigheterResponse;
+import se.minaombud.model.Identitetsbeteckning;
+import se.minaombud.model.PageParameters;
 
 /**
- * Sample API authenticating with end user.
+ * API sample authenticating with end user.
  *
  * <p>
  * Runs top to bottom illustrating each step:
@@ -57,7 +58,7 @@ public class EndUserSample extends SampleBase {
             "iat", iat,
             "exp", exp
         ));
-        var ssn = (String)userClaims.get("https://claims.oidc.se/1.0/personalNumber"); // Social security number
+        var ssn = (String)userClaims.get("https://id.oidc.se/claim/personalIdentityNumber"); // Social security number
 
         ///////////////////////////////////////////////////////////////////////////////
         // 2. Sign user claims

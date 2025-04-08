@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 class CliOptions {
     String apiUrl = Defaults.MINA_OMBUD_API_URL.toString();
@@ -18,7 +19,7 @@ class CliOptions {
     String iss = Defaults.MINA_OMBUD_SAMPLE_ISSUER;
     List<String> aud = new ArrayList<>();
     Map<String, Map<String, Object>> users = new LinkedHashMap<>();
-    String scope = "user:self";
+    String scope;
     Map<String, Object> user = null;
     String service = Defaults.MINA_OMBUD_SAMPLE_SERVICE;
     String clientId = Defaults.MINA_OMBUD_API_CLIENT_ID;
@@ -31,6 +32,7 @@ class CliOptions {
     String cmd;
     List<String> behorigheter = new ArrayList<>();
     List<String> fullmakter = new ArrayList<>();
+    List<UUID> arkivpaket = new ArrayList<>();
 
     String logLevel = "debug";
 }

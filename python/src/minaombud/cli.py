@@ -13,12 +13,20 @@ from minaombud.defaults import (
     MINA_OMBUD_SAMPLE_SERVICE,
     MINA_OMBUD_API_CLIENT_SECRET,
     MINA_OMBUD_SAMPLE_USER,
-    MINA_OMBUD_SAMPLE_USER_SCOPE,
+    MINA_OMBUD_SAMPLE_SCOPE,
     MINA_OMBUD_SAMPLE_AUDIENCE,
     MINA_OMBUD_SAMPLE_CLIENT_ID,
+    MINA_OMBUD_TREDJE_MAN,
 )
 from minaombud.model import Identitetsbeteckning, FullmaktsgivareRoll, FullmaktStatus
 from minaombud.user import create_user_token, load_user_database
+
+
+DEFAULT_SCOPES = {
+    "behorigheter": "user:self",
+    "fullmakter": "user:self",
+    "arkivpaket": "fullmakt:arkivering"
+}
 
 
 def main():
@@ -55,9 +63,8 @@ def main():
         metavar="FILE",
     )
     parser.add_argument(
-        "--user-scope",
-        default=MINA_OMBUD_SAMPLE_USER_SCOPE,
-        choices=("self", "other", "any"),
+        "--scope",
+        choices=("user:self", "user:other", "user:any", "fullmakt:arkivering"),
     )
     parser.add_argument("--keys", "--key", "-k", metavar="PATH", action="append")
     parser.add_argument("--service", default=MINA_OMBUD_SAMPLE_SERVICE)
@@ -65,6 +72,18 @@ def main():
     parser.add_argument("--client-secret", default=MINA_OMBUD_API_CLIENT_SECRET)
 
     subparsers = parser.add_subparsers(dest="cmd", help="kommando")
+
+    def arkivpaket_args():
+        p = subparsers.add_parser("arkivpaket", help="hämta arkivpaket")
+        p.add_argument(
+            "tredjeman", metavar="TREDJEMAN", help="Organisationsnummer för tredje man."
+        )
+        p.add_argument(
+            "paket",
+            nargs="*",
+            metavar="PAKET",
+            help="Hämta angivet arkivpaket",
+        )
 
     def behorigheter_args():
         p = subparsers.add_parser("behorigheter", help="sök behörigheter")
@@ -107,6 +126,7 @@ def main():
             "fullmakter", nargs="*", metavar="ID", help="Hämta fullmakter med ID."
         )
 
+    arkivpaket_args()
     behorigheter_args()
     fullmakter_args()
 
@@ -142,16 +162,32 @@ def main():
     else:
         user_token = None
 
+    scope = args.scope or DEFAULT_SCOPES.get(args.cmd, MINA_OMBUD_SAMPLE_SCOPE)
     client = MinaOmbudClient(
         service=args.service,
-        scope=f"user:{args.user_scope}",
+        scope=scope,
         client_id=args.client_id,
         client_secret=args.client_secret,
         token_url=args.token_url,
         url=args.url,
     )
 
-    if args.cmd == "behorigheter":
+    if args.cmd == "arkivpaket":
+        tredjeman = args.tredjeman
+        if args.paket:
+            paket = []
+            for paket_id in args.paket:
+                data = client.hamta_arkivpaket(tredjeman, paket_id)
+                zip_name = f"{paket_id}.zip"
+                with open(zip_name, "wb") as f:
+                    f.write(data)
+                paket.append(zip_name)
+
+            response = paket[0] if len(paket) == 1 else paket
+        else:
+            response = client.lista_arkivpaket(tredjeman)
+
+    elif args.cmd == "behorigheter":
         fullmaktshavare = Identitetsbeteckning.from_id(args.fullmaktshavare)
         if args.fullmaktsgivare:
             fullmaktsgivare = Identitetsbeteckning.from_id(args.fullmaktsgivare)
@@ -194,12 +230,7 @@ def main():
                 parser.error("Vid hämtning av specifika fullmakter används inte filter")
                 parser.exit(1)
 
-            if not args.tredjeman:
-                parser.print_help()
-                parser.error("Tredje man måste anges")
-                parser.exit(1)
-
-            tredjeman = args.tredjeman
+            tredjeman = args.tredjeman if args.tredjeman else [MINA_OMBUD_TREDJE_MAN]
             if len(args.tredjeman) == 1:
                 tredjeman = tredjeman * len(args.fullmakter)
             elif len(tredjeman) != len(args.fullmakter):

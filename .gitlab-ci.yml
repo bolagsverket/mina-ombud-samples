@@ -1,0 +1,171 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  MINA_OMBUD_API_URL:
+    value: https://fullmakt-test.minaombud.se/dfm/formedlare/v2
+    description: API URL
+
+  MINA_OMBUD_API_TOKEN_URL:
+    value: https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token
+    description: Token URL
+
+  # Skip integration tests
+  SKIP_ITS: "false"
+
+  # Pipeline job images
+  DOTNET_IMAGE: mcr.microsoft.com/dotnet/sdk:8.0
+  JAVA_IMAGE: eclipse-temurin:21
+  POWERSHELL_IMAGE: mcr.microsoft.com/powershell:latest
+  # Image used to build python samples.
+  # Does NOT need python, but requires docker cli and bash.
+  PYTHON_BUILD_IMAGE: ${DOCKER_HUB_PROXY_REPOSITORY}docker:cli
+
+  # OCI registry for pushing images (set these as CI/CD variables)
+  #REGISTRY_HOST: $HARBOR_HOST
+  #REGISTRY_USERNAME: $HARBOR_USERNAME
+  #REGISTRY_PASSWORD: $HARBOR_PASSWORD
+
+  # Repository for python sample image
+  PYTHON_SAMPLES_REPOSITORY: minaombud/python-sample
+
+.echo_environment: &echo_environment |
+  echo "Environment:"
+  echo "MINA_OMBUD_API_URL=$MINA_OMBUD_API_URL"
+  echo "MINA_OMBUD_API_TOKEN_URL=$MINA_OMBUD_API_TOKEN_URL"
+
+.build:
+  stage: build
+  before_script: *echo_environment
+
+Build Java:
+  extends: .build
+  image: $JAVA_IMAGE
+  variables:
+    MAVEN_REPO_OPTS: -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+  cache:
+    paths:
+      - .m2/repository
+  script:
+    - cd java
+    - ./mvnw -B $MAVEN_CLI_OPTS $MAVEN_REPO_OPTS -DskipITs="$SKIP_ITS" verify
+    - |
+      if [ "$SKIP_ITS" = false ]; then
+        for t in ArkiveringSample EndUserSample SystemServiceSample
+        do
+          echo "$t"
+          samples/bin/runsample "$t"
+        done
+      fi
+
+PowerShell:
+  extends: .build
+  image: $POWERSHELL_IMAGE
+  variables:
+    POWERSHELL_UPDATECHECK: "Off"
+  script:
+    - cd powershell
+    - |
+      for f in *Sample.ps1; do
+        pwsh -NoProfile -NonInteractive -NoLogo  -Command "Get-Command -Syntax ./$f"
+      done
+    - |
+      if [ "$SKIP_ITS" = false ]; then
+        for f in *Sample.ps1; do
+          echo "$f"
+          pwsh -NoProfile -NonInteractive -NoLogo "./$f"
+        done
+      fi
+
+Build .NET:
+  extends: .build
+  image: $DOTNET_IMAGE
+  before_script:
+    - *echo_environment
+    - |
+      if [ -n "$NUGET_SOURCE" ]; then
+        dotnet nuget config get all
+        dotnet nuget remove source "nuget.org"
+        dotnet nuget add source $NUGET_SOURCE --name "nuget.org"
+      fi
+  script:
+    - cd dotnet
+    - dotnet publish --configuration Release --use-current-runtime --self-contained --output out mina-ombud-samples.sln
+    - cd out
+    - |
+      if [ "$SKIP_ITS" = false ]; then
+        for f in *Sample; do
+          if [ -x "$f" ]; then
+            echo "$f"
+            "./$f"
+          fi
+        done
+      fi
+
+.extract_python_version: &extract_python_version >-
+  VERSION=$(sed -rn 's/^version\s*=\s*"([^"]+)"$/\1/p' python/pyproject.toml)
+
+Build Python:
+  extends: .build
+  image: $PYTHON_BUILD_IMAGE
+  services:
+    - docker:dind
+  before_script:
+    - *echo_environment
+    - |
+      if [ -x /sbin/apk ]; then
+        apk add bash
+      fi
+  script:
+    - *extract_python_version
+    - cd python
+    - tag="$VERSION-$CI_COMMIT_SHORT_SHA"
+    - image="$PYTHON_SAMPLES_REPOSITORY:$tag"
+    - ./build-docker-image.sh --image "$PYTHON_SAMPLES_REPOSITORY" --tag "$tag"
+    - |
+      if [ "$SKIP_ITS" = false ]; then
+        for t in adminuser arkivering enduser
+        do
+          echo "minaombud-sample-$t"
+          docker run -e MINA_OMBUD_API_URL -e MINA_OMBUD_API_TOKEN_URL --rm "$image" "minaombud-sample-$t"
+        done
+      fi
+    - docker save -o python-samples.tgz "$image"
+  artifacts:
+    paths:
+      - python/python-samples.tgz
+
+Push Python Image:
+  stage: deploy
+  image: $PYTHON_BUILD_IMAGE
+  dependencies:
+    - Build Python
+  services:
+    - docker:dind
+  variables:
+    VERSION_SUFFIX: "-$CI_COMMIT_SHORT_SHA"
+  rules:
+    - if: $REGISTRY_HOST == "" ||
+          $REGISTRY_HOST == null ||
+          $CI_PIPELINE_SOURCE !~ /^(push|web)$/
+      when: never
+    - if: $CI_COMMIT_BRANCH == "main"
+      variables:
+        VERSION_SUFFIX: ""
+    - if: $CI_COMMIT_BRANCH
+  before_script:
+    - echo "${REGISTRY_PASSWORD:?}" | docker login -u "${REGISTRY_USERNAME:?}" --password-stdin "${REGISTRY_HOST:?}"
+  script:
+    - *extract_python_version
+    - |
+      if [ -z "$VERSION_SUFFIX" ] && \
+         docker pull "$REGISTRY_HOST/$PYTHON_SAMPLES_REPOSITORY:$VERSION"
+      then
+        echo "$REGISTRY_HOST/$PYTHON_SAMPLES_REPOSITORY:$VERSION already exists" >&2
+        exit 1
+      fi
+    - docker load -i python/python-samples.tgz
+    - docker tag "$PYTHON_SAMPLES_REPOSITORY:$VERSION-$CI_COMMIT_SHORT_SHA" "$REGISTRY_HOST/$PYTHON_SAMPLES_REPOSITORY:$VERSION$VERSION_SUFFIX"
+    - docker push "$REGISTRY_HOST/$PYTHON_SAMPLES_REPOSITORY:$VERSION$VERSION_SUFFIX"

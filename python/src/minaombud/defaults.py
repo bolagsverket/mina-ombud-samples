@@ -75,7 +75,7 @@ MINA_OMBUD_SAMPLE_KEYS = _find_sample_keys()
 
 MINA_OMBUD_SAMPLE_USER = os.environ.get("MINA_OMBUD_SAMPLE_USER")
 MINA_OMBUD_SAMPLE_USER_PASSWORD = os.environ.get("MINA_OMBUD_SAMPLE_USER_PASSWORD")
-MINA_OMBUD_SAMPLE_USER_SCOPE = os.environ.get("MINA_OMBUD_SAMPLE_USER_SCOPE", "self")
+MINA_OMBUD_SAMPLE_SCOPE = os.environ.get("MINA_OMBUD_SAMPLE_USER_SCOPE", "user:self")
 
 MINA_OMBUD_TREDJE_MAN = os.environ.get("MINA_OMBUD_TREDJE_MAN", "2120000829")
 
@@ -99,7 +99,7 @@ MINA_OMBUD_SAMPLE_CLIENT_SECRET = os.environ.get("MINA_OMBUD_SAMPLE_CLIENT_SECRE
 
 MINA_OMBUD_USER_CLAIMS = {
     "sub": "4fe3e84f-400f-4459-b4ca-ae0ffdfe3ed2",
-    "https://claims.oidc.se/1.0/personalNumber": "198602262381",
+    "https://id.oidc.se/claim/personalIdentityNumber": "198602262381",
     "name": "Beri Ylles",
     "given_name": "Beri",
     "family_name": "Ylles",
@@ -114,7 +114,7 @@ def _init_user_claims():
         MINA_OMBUD_USER_CLAIMS.update(json.loads(claims))
     pnr = os.environ.get("MINA_OMBUD_USER_PNR")
     if pnr:
-        MINA_OMBUD_USER_CLAIMS["https://claims.oidc.se/1.0/personalNumber"] = pnr
+        MINA_OMBUD_USER_CLAIMS["https://id.oidc.se/claim/personalIdentityNumber"] = pnr
 
 
 _init_user_claims()

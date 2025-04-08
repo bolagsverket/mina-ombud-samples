@@ -1,30 +1,34 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 SCRIPT_DIR=$(dirname "$0")
 ROOT_DIR="$SCRIPT_DIR/.."
 
 IMAGE=${IMAGE:-minaombud/python-sample}
-PUSH=${PUSH:-n}
-[ "$PUSH" = true ] && PUSH=y
+if [ -z "$VERSION" ]; then
+  VERSION=$(sed -rn 's/^version\s*=\s*"([^"]+)"$/\1/p' <"$SCRIPT_DIR/pyproject.toml") || exit $?
+fi
 
-DISABLE_SSL_TRUST=${DISABLE_SSL_TRUST:-0}
-VERSION=$(sed -rn 's/^version\s*=\s*"([^"]+)"$/\1/p' <"$SCRIPT_DIR/pyproject.toml") || exit $?
+buildargs=()
+[ -n "$SKIP_ITS" ] && buildargs+=(--build-arg "SKIP_ITS=$SKIP_ITS")
+[ -n "$MINA_OMBUD_API_URL" ] && buildargs+=(--build-arg "MINA_OMBUD_API_URL=$MINA_OMBUD_API_URL")
+[ -n "$MINA_OMBUD_API_TOKEN_URL" ] && buildargs+=(--build-arg "MINA_OMBUD_API_TOKEN_URL=$MINA_OMBUD_API_TOKEN_URL")
+[ -n "$DOCKER_HUB_PROXY_REPOSITORY" ] && buildargs+=(--build-arg "DOCKER_HUB_PROXY_REPOSITORY=$DOCKER_HUB_PROXY_REPOSITORY")
+if [[ "$DISABLE_SSL_TRUST" =~ true|1 ]]; then
+  export PIP_TRUSTED_HOST="pypi.python.org pypi.org"
+fi
 
 while [ $# -gt 0 ]; do
   case "$1" in
     -latest | --latest) LATEST=y ;;
-    -push | --push) PUSH=y ;;
     -tag | --tag) TAG="$2"; shift ;;
     -image | --image) IMAGE="$2"; shift ;;
-    -registry | --registry) REGISTRY="$2"; shift ;;
+    --build-arg) buildargs+=(--build-arg "$2"); shift ;;
     *)
       echo "$0: invalid option: $1" >&2
       echo "Syntax: $0 [OPTIONS...]" >&2
       echo "  --latest        tag as latest" >&2
-      echo "  --push          tag and push image to registry" >&2
       echo "  --image NAME    set name of image (default: $IMAGE)">&2
       echo "  --tag TAG       set tag (default: $VERSION)" >&2
-      echo "  --registry HOST set registry for push" >&2
       echo
       exit 1
   esac
@@ -44,32 +48,28 @@ elif [ -z "$LATEST" ]; then
 fi
 
 cp -r "$ROOT_DIR/data" "$SCRIPT_DIR" || exit $?
-cleanup="$SCRIPT_DIR/data"
-trap 'rm -rf $cleanup' EXIT
+trap 'rm -rf $SCRIPT_DIR/data' EXIT
 
-docker build --pull -t "$IMAGE:$TAG" --build-arg "DISABLE_SSL_TRUST=$DISABLE_SSL_TRUST" "$SCRIPT_DIR"
+for e in PIP_INDEX PIP_INDEX_URL PIP_TRUSTED_HOST; do
+  v="${!e}"
+  if [ -n "$v" ]; then
+    echo "$e=$v"
+    buildargs+=(--secret id="$e")
+  fi
+done
+
+for e in PIP_CERT PIP_CONFIG_FILE; do
+  v="${!e}"
+  if [ -n "$v" ]; then
+    echo "$e=$v"
+    buildargs+=(--secret "id=$e,src=$v")
+  fi
+done
+
+echo docker build --pull -t "$IMAGE:$TAG" "${buildargs[@]}" "$SCRIPT_DIR"
+docker build --pull --progress plain -t "$IMAGE:$TAG" "${buildargs[@]}" "$SCRIPT_DIR" || exit $?
 if [ "$LATEST" = y ]; then
   docker tag "$IMAGE:$TAG" "$IMAGE:latest" || exit $?
-fi
-
-tag_and_push() {
-  echo "Pushing image $IMAGE:$1..."
-  registry=${REGISTRY?-missing}
-  docker tag "$IMAGE:$TAG" "$registry/$IMAGE:$1" \
-    && docker push "$registry/$IMAGE:$1" \
-    || exit $?
-}
-
-if [ -n "$REGISTRY_CREDENTIALS_USR" ]; then
-  tmp_base="${WORKSPACE:-$ROOT_DIR}"
-  export DOCKER_CONFIG=$(mktemp -d -p "$tmp_base") || exit $?
-  cleanup="$cleanup $DOCKER_CONFIG"
-  echo "$REGISTRY_CREDENTIALS_PSW" | docker login -u "$REGISTRY_CREDENTIALS_USR" --password-stdin $REGISTRY
-fi
-
-if [ "$PUSH" = y ]; then
-  tag_and_push "$TAG"
-  [ "$LATEST" = y ] && tag_and_push latest
 fi
 
 echo "$IMAGE:$TAG"

@@ -11,7 +11,7 @@ charset = utf-8
 [*.md]
 trim_trailing_whitespace = false
 
-[*.{json,sh,tpl,yaml}]
+[*.{json,sh,tpl,yaml,yml}]
 indent_size = 2
 
 [*.{sln,csproj,cmd,bat,ps1}]

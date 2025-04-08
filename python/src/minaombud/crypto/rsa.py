@@ -108,13 +108,10 @@ class RSACryptoFamily(CryptoFamily[RSAKey]):
         if isinstance(key, RSAKey):
             return typing.cast(RSAKey, key)
 
-        if any(p not in key for p in ("n", "e")):
+        if any(p not in key or key[p] is None for p in ("n", "e")):
             raise ValueError(
                 f"RSA key {key.kid} is missing required public key parameters"
             )
-
-        assert key.e is not None
-        assert key.n is not None
 
         e = base64_decode_uint(key.e)
         n = base64_decode_uint(key.n)

@@ -1,7 +1,29 @@
 package se.minaombud.samples.cli;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.CookieManager;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import se.minaombud.client.ApiClient;
+import se.minaombud.client.ApiException;
+import se.minaombud.crypto.KeyList;
+import se.minaombud.json.Json;
+import se.minaombud.model.ArkiveringsinformationResponse;
 import se.minaombud.model.FullmaktMetadataResponse;
 import se.minaombud.model.FullmaktsgivareRoll;
 import se.minaombud.model.HamtaBehorigheterRequest;
@@ -11,23 +33,6 @@ import se.minaombud.model.HamtaFullmakterResponse;
 import se.minaombud.model.Identitetsbeteckning;
 import se.minaombud.samples.Defaults;
 import se.minaombud.samples.Users;
-import se.minaombud.client.ApiClient;
-import se.minaombud.client.ApiException;
-import se.minaombud.crypto.KeyList;
-import se.minaombud.json.Json;
-
-import java.io.PrintStream;
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 public class CliDriver {
 
@@ -39,7 +44,7 @@ public class CliDriver {
         this.client = client;
     }
 
-    Object executeCommand(CliOptions opts) {
+    Object executeCommand(CliOptions opts) throws Exception {
         if ("help".equals(opts.cmd)) {
             help(System.out);
             return null;
@@ -56,6 +61,19 @@ public class CliDriver {
 
         if ("behorigheter".equals(opts.cmd)) {
             return sokBehorigheter(opts);
+        }
+
+        if ("arkivpaket".equals(opts.cmd)) {
+            if (opts.scope == null) {
+                client.scope("fullmakt:arkivering");
+            }
+
+            if (opts.arkivpaket.isEmpty()) {
+                return listaArkivpaket(opts);
+            }
+
+            var paket = hamtaArkivpaket(opts);
+            return paket.size() == 1 ? paket.get(0) : paket;
         }
 
         throw new IllegalArgumentException("Unsupported command: " + opts.cmd);
@@ -122,6 +140,21 @@ public class CliDriver {
         return client.request().sokBehorigheter(request);
     }
 
+    ArkiveringsinformationResponse listaArkivpaket(CliOptions opts) {
+        return client.request().listaArkivpaket(opts.tredjeman, 0, 10);
+    }
+
+    List<String> hamtaArkivpaket(CliOptions opts) throws IOException {
+        List<String> paths = new ArrayList<>();
+        for (var paketId : opts.arkivpaket) {
+            var paket = client.request().hamtaArkivpaket(opts.tredjeman, paketId);
+            var filename = paketId + ".zip";
+            paths.add(filename);
+            Files.write(Paths.get(filename), paket);
+        }
+        return paths;
+    }
+
     static void help(PrintStream out) {
         out.println("Syntax: [VÄXLAR] kommando [argument...]");
         out.println("Växlar:");
@@ -142,6 +175,7 @@ public class CliDriver {
         out.println("Kommandon:");
         out.println("   behorigheter [KOD...]          sök behörigheter");
         out.println("   fullmakter [ID...]             sök eller hämta angivna fullmakter");
+        out.println("   arkivpaket [ID...]             sök eller hämta angivna arkivpaket");
         out.println("   help                           denna text");
     }
 
@@ -149,7 +183,8 @@ public class CliDriver {
         final var CMD_ARG_COUNT = Map.of(
             "help", new int[]{ 0, 1 },
             "fullmakter", new int[]{ 0, Integer.MAX_VALUE },
-            "behorigheter", new int[]{ 0, Integer.MAX_VALUE }
+            "behorigheter", new int[]{ 0, Integer.MAX_VALUE },
+            "arkivpaket", new int[]{ 0, Integer.MAX_VALUE }
         );
 
         var opts = new CliOptions();
@@ -249,6 +284,13 @@ public class CliDriver {
                 throw new CliException("Syntax: behorigheter --tredjeman ORGNR [BEHORIGHETSKOD...]");
             }
             opts.behorigheter = cmdArgs;
+        } else if ("arkivpaket".equals(opts.cmd)) {
+            if (opts.tredjeman == null) {
+                throw new CliException("Syntax: arkivpaket --tredjeman ORGNR [PAKETID...]");
+            }
+            opts.arkivpaket = cmdArgs.stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList());
         }
 
         if (opts.fullmaktshavare == null && user != null && user.matches("(19|20)\\d{6}-?\\d{4}")) {
@@ -266,7 +308,7 @@ public class CliDriver {
         } else {
             opts.user = Map.of(
                 "sub", "9ebe70e4-ca61-11ed-97ed-00155d52ccdb",
-                "https://claims.oidc.se/1.0/personalNumber", "198602262381",
+                "https://id.oidc.se/claim/personalIdentityNumber", "198602262381",
                 "name", "Beri Ylles",
                 "given_name", "Beri",
                 "family_name", "Ylles");
@@ -308,7 +350,7 @@ public class CliDriver {
             .clientId(opts.clientId)
             .clientSecret(opts.clientSecret)
             .service(opts.service)
-            .scope(opts.scope)
+            .scope(Optional.ofNullable(opts.scope).orElse("user:self"))
             .issuer(opts.iss)
             .audience(opts.aud)
             .user(opts.user);

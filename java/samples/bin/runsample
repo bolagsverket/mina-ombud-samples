@@ -31,11 +31,11 @@ esac
 
 main=se.minaombud.samples.cli.CliDriver
 case "$1" in
-    EndUserSample | SystemServiceSample)
-        main=se.minaombud.samples.$1
+    se.*)
+        main="$1"
         shift
         ;;
-    se.*)
+    *Sample)
         main=se.minaombud.samples.$1
         shift
         ;;

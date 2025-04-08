@@ -31,7 +31,7 @@ var userClaims = new Dictionary<string, object>(defaults.MINA_OMBUD_USER_CLAIMS)
     { "iat", iat },
     { "exp", exp }
 };
-var ssn = (string)userClaims["https://claims.oidc.se/1.0/personalNumber"]; // Social security number
+var ssn = (string)userClaims["https://id.oidc.se/claim/personalIdentityNumber"]; // Social security number
 
 ///////////////////////////////////////////////////////////////////////////////
 // 2. Sign user claimsl

@@ -27,7 +27,7 @@ public class Defaults
     public Dictionary<string, object> MINA_OMBUD_USER_CLAIMS = new Dictionary<string, object>
     {
         { "sub", "4fe3e84f-400f-4459-b4ca-ae0ffdfe3ed2" },
-        { "https://claims.oidc.se/1.0/personalNumber", "198602262381" },
+        { "https://id.oidc.se/claim/personalIdentityNumber", "198602262381" },
         { "name", "Beri Ylles" },
         { "given_name", "Beri" },
         { "family_name", "Ylles" },
@@ -55,7 +55,7 @@ public class Defaults
         var pnr = GetEnv("MINA_OMBUD_USER_PNR", String.Empty);
         if (pnr.Length > 0)
         {
-            MINA_OMBUD_USER_CLAIMS["https://claims.oidc.se/1.0/personalNumber"] = pnr;
+            MINA_OMBUD_USER_CLAIMS["https://id.oidc.se/claim/personalIdentityNumber"] = pnr;
         }
     }
 

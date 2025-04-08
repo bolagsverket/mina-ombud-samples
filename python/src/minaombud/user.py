@@ -10,17 +10,14 @@ from minaombud.crypto.jwkset import JwkSet
 from minaombud.model import Identitetstyp, Identitetsbeteckning
 
 _USER_INFO_SCOPES = {
-    "https://scopes.oidc.se/1.0/naturalPersonPnr": {
-        "https://claims.oidc.se/1.0/personalNumber",
-        "https://claims.oidc.se/1.0/coordinationNumber",
-        "birtdate",
-        "family_name",
-        "given_name",
-        "name",
+    "https://id.oidc.se/scope/naturalPersonNumber": {
+        "https://id.oidc.se/claim/personalIdentityNumber",
+        "https://id.oidc.se/claim/coordinationNumber"
     },
-    "https://scopes.oidc.se/1.0/naturalPersonName": {
+    "https://id.oidc.se/scope/naturalPersonInfo": {
         "family_name",
         "given_name",
+        "birtdate",
         "name",
     },
     "profile": {"family_name", "given_name", "name", "preferred_username"},
@@ -106,8 +103,8 @@ def auth_user(
 
     claims.update({k: v for k, v in user.items() if not k.startswith("_")})
     userid_claims = (
-        "https://claims.oidc.se/1.0/personalNumber",
-        "https://claims.oidc.se/1.0/coordinationNumber",
+        "https://id.oidc.se/claim/personalIdentityNumber",
+        "https://id.oidc.se/claim/coordinationNumber",
         "preferred_username",
     )
 
@@ -211,9 +208,9 @@ def create_user_token(
         if identitet:
             username = identitet.id
             if identitet.typ == Identitetstyp.PNR:
-                claims["https://claims.oidc.se/1.0/personalNumber"] = identitet.id
+                claims["https://id.oidc.se/claim/personalIdentityNumber"] = identitet.id
             elif identitet.typ == Identitetstyp.SAMNR:
-                claims["https://claims.oidc.se/1.0/coordinationNumber"] = identitet.id
+                claims["https://id.oidc.se/claim/coordinationNumber"] = identitet.id
             else:
                 claims["sub"] = f"{identitet.typ}:{identitet.id}"
         else:
@@ -265,8 +262,8 @@ def create_user_token(
 def load_user_database(f):
     userid_claims = (
         "preferred_username",
-        "https://claims.oidc.se/1.0/personalNumber",
-        "https://claims.oidc.se/1.0/coordinationNumber",
+        "https://id.oidc.se/claim/personalIdentityNumber",
+        "https://id.oidc.se/claim/coordinationNumber",
         "sub",
         "nickname",
         "name",

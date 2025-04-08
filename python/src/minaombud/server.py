@@ -371,6 +371,7 @@ class UserTokenHandler(PathHandler):
             content_type, params = cgi.parse_header(content_type)
         else:
             content_type, params = "application/octet-stream", {}
+        accepts = headers.get("accept", [])
         content_type = content_type.lower()
         charset = params.get("charset")
         if not charset:
@@ -409,11 +410,11 @@ class UserTokenHandler(PathHandler):
                         )
                         if identitet.typ == Identitetstyp.PNR:
                             claims[
-                                "https://claims.oidc.se/1.0/personalNumber"
+                                "https://id.oidc.se/claim/personalIdentityNumber"
                             ] = identitet.id
                         elif identitet.typ == Identitetstyp.SAMNR:
                             claims[
-                                "https://claims.oidc.se/1.0/coordinationNumber"
+                                "https://id.oidc.se/claim/coordinationNumber"
                             ] = identitet.id
                         else:
                             claims["sub"] = f"{identitet.typ}:{identitet.id}"
@@ -436,6 +437,8 @@ class UserTokenHandler(PathHandler):
         except Unauthorized:
             return error(HTTPStatus.UNAUTHORIZED)
 
+        if "application/jose" not in accepts and "text/plain" in accepts:
+            return Response.ok(token, "text/plain")
         return Response.ok(token, "application/jose")
 
 

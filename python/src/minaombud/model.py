@@ -293,6 +293,20 @@ class FullmaktMetadataResponse(JSONClass):
     _sig: JwsSig
 
 
+@dataclass
+class Arkiveringspaket(JSONClass):
+    id: UUID
+    namn: str
+    antal_fullmakter: int
+    skapatDatum: datetime
+
+
+@dataclass
+class ArkiveringsinformationResponse(JSONClass):
+    paket: List[Arkiveringspaket]
+    page: PageMetadata
+
+
 def classify_swedish_identity(s: str) -> Identitetstyp:
     if s.startswith("16") and len(s) == 12:
         s = s[2:]

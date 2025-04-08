@@ -178,6 +178,20 @@ public class ApiError
     [JsonExtensionData] public Dictionary<string, Object>? AdditionalProperties { get; set; }
 }
 
+public class Arkiveringspaket
+{
+    public string Id { get; set; }
+    public string Namn { get; set; }
+    public int AntalFullmakter { get; set; }
+    public DateTimeOffset SkapatDatum { get; set; }
+}
+
+public class ArkiveringsinformationResponse
+{
+    public List<Arkiveringspaket> Paket { get; set; }
+    public PageMetadata Page;
+}
+
 public class HamtaFullmakterResponse
 {
     public List<FullmaktListItem> Fullmakter { get; set; }

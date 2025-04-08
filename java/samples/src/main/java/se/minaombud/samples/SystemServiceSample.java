@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import static se.minaombud.samples.Defaults.MINA_OMBUD_TREDJE_MAN;
 
 /**
- * Sample API authenticating as an offline service.
+ * API sample authenticating as a system service without end user.
  *
  * <p>
  * Runs top to bottom illustrating each step:

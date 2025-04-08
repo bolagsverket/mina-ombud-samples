@@ -56,9 +56,9 @@ class ParsedJwk(Generic[PUB, PVK], Jwk):
         if self.certificates:
             cert = self.certificates[0]
             if not self.not_valid_before:
-                self.not_valid_before = cert.not_valid_before
+                self.not_valid_before = cert.not_valid_before_utc
             if not self.not_valid_after:
-                self.not_valid_after = cert.not_valid_after
+                self.not_valid_after = cert.not_valid_after_utc
             if not self.x5t:
                 sha1 = hashes.SHA1()
                 self.x5t = base64_encode_urlsafe(cert.fingerprint(sha1)).decode("ascii")

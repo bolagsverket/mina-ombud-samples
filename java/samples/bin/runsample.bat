@@ -17,14 +17,13 @@ if "%JAVA%" == "" set JAVA=java
 
 :start
 set main=se.minaombud.samples.cli.CliDriver
-if "%1" == "EndUserSample" (
+set arg=%1
+set suf=%arg:~-6%
+if "%suf%" == "Sample" (
     set main=se.minaombud.samples.%1
     shift
 )
-if "%1" == "SystemServiceSample" (
-    set main=se.minaombud.samples.%1
-    shift
-)
+
 
 if not "%MINA_OMBUD_SAMPLE_DATA%" == "" goto run
 if exist "%BASEDIR%\..\..\data" set MINA_OMBUD_SAMPLE_DATA=%BASEDIR%\..\..\data

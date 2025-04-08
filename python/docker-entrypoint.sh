@@ -7,6 +7,9 @@ case "$1" in
     shift
     exec python -m minaombud.server "$@"
     ;;
+  minaombud-sample-*)
+    exec "$@"
+    ;;
   *)
     exec python -m minaombud.cli "$@"
     ;;

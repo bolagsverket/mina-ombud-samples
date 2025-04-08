@@ -1,8 +1,5 @@
 package se.minaombud.samples;
 
-import se.minaombud.crypto.JwsVerifier;
-import se.minaombud.json.Json;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -14,6 +11,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import se.minaombud.crypto.JwsVerifier;
+import se.minaombud.json.Json;
 
 class SampleBase {
 
@@ -68,13 +68,18 @@ class SampleBase {
     }
 
     static <T> T get(Class<T> type, String url) throws IOException {
-        return get(type, url, defaultHeaders);
+        return send(type, "GET", url, defaultHeaders);
     }
 
-    static <T> T get(Class<T> type, String url, Map<String, String> headers) throws IOException {
+    static <T> T delete(Class<T> type, String url) throws IOException {
+        return send(type, "DELETE", url, defaultHeaders);
+    }
+
+
+    static <T> T send(Class<T> type, String method, String url, Map<String, String> headers) throws IOException {
         var conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setInstanceFollowRedirects(false);
-        conn.setRequestMethod("GET");
+        conn.setRequestMethod(method);
         conn.setDoOutput(false);
         conn.setDoInput(true);
         conn.setRequestProperty("accept", "application/json");

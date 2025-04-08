@@ -1,3 +1,6 @@
+import os
+import pytest
+
 from minaombud.client import MinaOmbudClient
 from minaombud.crypto.jwkset import JwkSet
 from minaombud.defaults import (
@@ -41,6 +44,7 @@ def new_client():
                            token_url=MINA_OMBUD_API_TOKEN_URL)
 
 
+@pytest.mark.skipif(os.environ["SKIP_ITS"] == "true", reason="SKIP_ITS == true")
 def test_sok_fullmakter():
     client = new_client()
     user_token = new_user_token("198602262381")
@@ -50,6 +54,7 @@ def test_sok_fullmakter():
     assert isinstance(response.fullmakter, list)
 
 
+@pytest.mark.skipif(os.environ["SKIP_ITS"] == "true", reason="SKIP_ITS == true")
 def test_sok_behorigheter():
     client = new_client()
     user_token = new_user_token("198602262381")

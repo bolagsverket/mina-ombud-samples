@@ -1,12 +1,7 @@
 package se.minaombud.client;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import se.minaombud.crypto.KeyList;
-import se.minaombud.json.Json;
-import se.minaombud.model.HamtaBehorigheterRequest;
-import se.minaombud.model.HamtaFullmakterRequest;
-import se.minaombud.model.Identitetsbeteckning;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,7 +10,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import se.minaombud.crypto.KeyList;
+import se.minaombud.json.Json;
+import se.minaombud.model.HamtaBehorigheterRequest;
+import se.minaombud.model.HamtaFullmakterRequest;
+import se.minaombud.model.Identitetsbeteckning;
 
 class ApiClientTestIT {
 
@@ -55,7 +57,7 @@ class ApiClientTestIT {
         "name", "Beri Ylles",
         "given_name", "Beri",
         "family_name", "Ylles",
-        "https://claims.oidc.se/1.0/personalNumber", ssn);
+        "https://id.oidc.se/claim/personalIdentityNumber", ssn);
 
     static ApiClient client;
 
@@ -123,6 +125,24 @@ class ApiClientTestIT {
             .scope("user:any")
             .request()
             .sokBehorigheter(request));
+    }
+
+    @Test
+    void kan_hamta_arkivpaket() {
+        var lista = client
+            .scope("fullmakt:arkivering")
+            .request()
+            .listaArkivpaket(MINA_OMBUD_TREDJE_MAN, 0, 10)
+            .getPaket();
+        assertThat(lista)
+            .isNotNull();
+        for (var paketinfo : lista) {
+            var data = client
+                .request()
+                .hamtaArkivpaket(MINA_OMBUD_TREDJE_MAN, paketinfo.getId());
+            assertThat(data)
+                .isNotEmpty();
+        }
     }
 
 }
