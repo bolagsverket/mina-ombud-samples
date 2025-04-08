@@ -65,7 +65,7 @@ för konkreta exempel.
 
 ### 3. Anropa API med access och id-token
 ```http request
-POST /dfm/formedlare/v1/sok/behorigheter HTTP/1.1
+POST /dfm/formedlare/v2/sok/behorigheter HTTP/1.1
 Authorization: Bearer <access_token>
 X-Id-Token: <user_token>
 X-Service-Name: myservice
