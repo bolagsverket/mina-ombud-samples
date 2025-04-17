@@ -145,16 +145,14 @@ Mina ombud kräver en signerad JWT med information om slutanvändaren.
 
 Följande krav finns på nycklar för verifiering av signaturer
 - En RSA-nyckel med en minsta längd på 2048 bitar ska användas.
+- Den publika nyckeln ska publiceras som ett JSON Web Key Set
+  åtkomligt för Mina ombud. [RFC 7517](https://www.rfc-editor.org/rfc/rfc7517#section-5).
 - Attributet `kty` ska ha värdet `RSA` vilket indikerar en RSA-nyckel.
 - Attributet `alg` ska OM det anges vara `RS256`, `RS384` eller `RS512` enligt
   [RFC 7518](https://www.rfc-editor.org/rfc/rfc7518#section-3.1).
 - Attributet `use` ska ha värdet `sig` eller utelämnas.
 - Attributet `key_ops` bör utelämnas men om det anges ska det innehålla värdet `verify`.
-- Den publika nyckeln ska publiceras med tillhörande X.509-certifikat
-  som ett JSON Web Key Set enligt [RFC 7517](https://www.rfc-editor.org/rfc/rfc7517#section-5)
-  åtkomligt för Mina ombud.
-- Attributet `x5c` ska inkludera certifikatet och eventuell certifikatskedja.
-- Attributet `x5t#S256` ska anges.
+- Om JSON Web Key Set innehåller ett certifikat så ska även `x5t#S256` anges.
 - Nycklar ska identifieras med Key ID (attributet `kid`) som t.ex.
   kan sättas till samma värde som `x5t#S256` (SHA-256 fingerprint av certifikatet),
   SHA-256 av den publika nyckeln (modulus och exponent), ett UUID eller
@@ -169,15 +167,15 @@ Följande krav finns på den JWS som innehåller användarinformation
   vilken nyckel som används för att verifiera signaturen.
 - Attributet `typ` i JWS protected header ska utelämnas eller
   sättas till värdet `JWT`. 
-- Attributet `iss` ska om det används registreras med Mina ombud
-  för att verifieras.
+- Attributet `iss` ska registreras i Mina ombud admin för att verifieras.
 - Om attributet `aud` används så ska accepterade värden registreras
-  med Mina ombud för att kunna verifieras.
+  i Mina ombud admin för att kunna verifieras.
 - Claims ska ha separata issuer (`iss`) och audience (`aud`)
   om någon typ av testautentisering används (t.ex. BankID för test)
   jämfört med värden för skarp autentisering. Detta för att mimimera
-  datapåverkan i händelse att fel miljö konfigureras.
-- Attributet `azp` ska finnas om `aud` innehåller flera värden.
+  konsekvenser av felkonfigurerade miljöer.
+- Attributet `azp` ska finnas och matcha ett av elementen i `aud`
+  om `aud` är en lista med flera värden.
 - Attributen `iat` och `exp` bör anges för att begränsa informationens
   livslängd och hur länge en exponerad token kan brukas.
 - Attributet `https://id.oidc.se/claim/personalIdentityNumber` ska sättas
