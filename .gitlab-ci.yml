@@ -111,7 +111,7 @@ Build Python:
   extends: .build
   image: $PYTHON_BUILD_IMAGE
   services:
-    - docker:dind
+    - ${DOCKER_HUB_PROXY_REPOSITORY}docker:dind
   before_script:
     - *echo_environment
     - |
@@ -143,7 +143,7 @@ Push Python Image:
   dependencies:
     - Build Python
   services:
-    - docker:dind
+    - ${DOCKER_HUB_PROXY_REPOSITORY}docker:dind
   variables:
     VERSION_SUFFIX: "-$CI_COMMIT_SHORT_SHA"
   rules:
