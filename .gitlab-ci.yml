@@ -155,13 +155,14 @@ Push Python Image:
       variables:
         VERSION_SUFFIX: ""
     - if: $CI_COMMIT_BRANCH
+      when: manual
+      allow_failure: true
   before_script:
     - echo "${REGISTRY_PASSWORD:?}" | docker login -u "${REGISTRY_USERNAME:?}" --password-stdin "${REGISTRY_HOST:?}"
   script:
     - *extract_python_version
     - |
-      if [ -z "$VERSION_SUFFIX" ] && \
-         docker pull "$REGISTRY_HOST/$PYTHON_SAMPLES_REPOSITORY:$VERSION"
+      if docker pull "$REGISTRY_HOST/$PYTHON_SAMPLES_REPOSITORY:$VERSION"
       then
         echo "$REGISTRY_HOST/$PYTHON_SAMPLES_REPOSITORY:$VERSION already exists" >&2
         exit 1
