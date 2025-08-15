@@ -11,7 +11,7 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <revision>0.1.8</revision>
+        <revision>0.1.9</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven.install.skip>true</maven.install.skip>
