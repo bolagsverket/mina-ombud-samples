@@ -12,6 +12,9 @@ variables:
     value: https://auth-accept.minaombud.se/auth/realms/dfm-accept2/protocol/openid-connect/token
     description: Token URL
 
+  OPENAPI_SPEC_URL:
+    value: https://static.minaombud.se/openapi/dfm_konsument_v2.yaml
+
   # Skip integration tests
   SKIP_ITS: "false"
 
@@ -50,7 +53,8 @@ Build Java:
       - .m2/repository
   script:
     - cd java
-    - ./mvnw -B $MAVEN_CLI_OPTS $MAVEN_REPO_OPTS -DskipITs="$SKIP_ITS" verify
+    - echo 'OpenAPI spec:' "$OPENAPI_SPEC_URL"
+    - ./mvnw -B $MAVEN_CLI_OPTS -Dopenapi.spec.url=${OPENAPI_SPEC_URL} $MAVEN_REPO_OPTS -DskipITs="$SKIP_ITS" verify
     - |
       if [ "$SKIP_ITS" = false ]; then
         for t in ArkiveringSample EndUserSample SystemServiceSample

@@ -16,6 +16,7 @@
 
     <properties>
         <maven.install.skip>false</maven.install.skip>
+        <openapi.spec.url>https://static.minaombud.se/openapi/dfm_konsument_v2.yaml</openapi.spec.url>
     </properties>
 
     <build>
@@ -46,7 +47,7 @@
                         </goals>
                         <configuration>
 <!--                            <inputSpec>https://static-test.minaombud.se/openapi/dfm_konsument_v1.yaml</inputSpec>-->
-                            <inputSpec>https://static.minaombud.se/openapi/dfm_konsument_v2.yaml</inputSpec>
+                            <inputSpec>${openapi.spec.url}</inputSpec>
                             <ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
                             <templateDirectory>${project.basedir}/openapi-templates</templateDirectory>
                             <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
