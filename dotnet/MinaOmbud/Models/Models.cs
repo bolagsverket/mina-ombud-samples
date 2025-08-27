@@ -181,7 +181,8 @@ public class ApiError
 public class Arkiveringspaket
 {
     public string Id { get; set; }
-    public string Namn { get; set; }
+    public string MallsvitId { get; set; }
+    public string Sekvensnummer { get; set; }
     public int AntalFullmakter { get; set; }
     public DateTimeOffset SkapatDatum { get; set; }
 }

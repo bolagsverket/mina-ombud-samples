@@ -47,7 +47,7 @@ def sample():
         output_dir = "archive"
         for pkg in list_response_json["paket"]:
             pkg_id = pkg["id"]
-            pkg_name = pkg["namn"]
+            pkg_name = pkg_id
             zip_dir = os.path.join(output_dir, pkg_name)
             zip_name = f"{pkg_id}.zip"
             Path(zip_dir).mkdir(parents=True, exist_ok=True)

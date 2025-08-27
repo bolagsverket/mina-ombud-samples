@@ -108,10 +108,10 @@ public class ArkiveringSample extends SampleBase {
                     ///////////////////////////////////////////////////////////////////////////////
                     // 3. Invoke API "hamtaArkiveringspaket"
                     // Download, unpack and validate package
-                    var zipDir = outputDir.resolve(pkg.getNamn());
+                    var zipDir = outputDir.resolve(pkg.getId().toString());
                     Files.createDirectories(zipDir);
                     var zipPath = downloadPackage(pkg, zipDir);
-                    System.out.printf("Package %s with %d files downloaded: %s%n", pkg.getNamn(), pkg.getAntalFullmakter(), zipPath);
+                    System.out.printf("Package %s with %d files downloaded: %s%n", pkg.getId(), pkg.getAntalFullmakter(), zipPath);
                     packagesDownloaded++;
 
                     var contents = unpackZipFile(zipDir, zipPath);

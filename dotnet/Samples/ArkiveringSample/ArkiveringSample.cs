@@ -52,7 +52,7 @@ foreach (var pkg in response.Paket)
 {
     var id = pkg.Id;
     var ZipName = $"{id}.zip";
-    var ZipDir = Path.Join(OutputDir, pkg.Namn);
+    var ZipDir = Path.Join(OutputDir, pkg.Id);
     var ZipPath = Path.Join(ZipDir, ZipName);
     var ZipData = await GetBytes($"{PaketUrl}/{id}");
     Directory.CreateDirectory(ZipDir);

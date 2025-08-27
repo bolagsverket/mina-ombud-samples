@@ -296,7 +296,8 @@ class FullmaktMetadataResponse(JSONClass):
 @dataclass
 class Arkiveringspaket(JSONClass):
     id: UUID
-    namn: str
+    sekvensnummer: int
+    mallsvitId: UUID
     antal_fullmakter: int
     skapatDatum: datetime
 
