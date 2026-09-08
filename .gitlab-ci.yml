@@ -3,6 +3,15 @@ stages:
   - test
   - deploy
 
+workflow:
+  auto_cancel:
+    on_job_failure: none
+    on_new_commit: interruptible
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"
+      when: never
+    - when: always
+
 variables:
   MINA_OMBUD_API_URL:
     value: https://fullmakt-test.minaombud.se/dfm/formedlare/v2
@@ -34,6 +43,9 @@ variables:
   # Repository for python sample image
   PYTHON_SAMPLES_REPOSITORY: minaombud/python-sample
 
+  # Maven local repository location
+  MAVEN_REPO_OPTS: -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+
 .echo_environment: &echo_environment |
   echo "Environment:"
   echo "MINA_OMBUD_API_URL=$MINA_OMBUD_API_URL"
@@ -41,13 +53,12 @@ variables:
 
 .build:
   stage: build
+  interruptible: true
   before_script: *echo_environment
 
 Build Java:
   extends: .build
   image: $JAVA_IMAGE
-  variables:
-    MAVEN_REPO_OPTS: -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
   cache:
     paths:
       - .m2/repository
@@ -63,6 +74,21 @@ Build Java:
           samples/bin/runsample "$t"
         done
       fi
+
+Maven dependency graph:
+  extends: Build Java
+  rules:
+    - if: $GITLAB_FEATURES =~ /\bdependency_scanning\b/
+  before_script: ''
+  needs:
+    - job: Build Java
+      artifacts: false
+  script:
+    - cd java
+    - ./mvnw -B $MAVEN_CLI_OPTS $MAVEN_REPO_OPTS org.apache.maven.plugins:maven-dependency-plugin:tree -DoutputType=json -DoutputFile=target/maven.graph.json
+  artifacts:
+    paths:
+      - '**/target/maven.graph.json'
 
 PowerShell:
   extends: .build
