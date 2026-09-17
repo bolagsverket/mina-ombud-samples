@@ -355,6 +355,15 @@ class OAuth2TokenHandler(PathHandler):
         return Response.ok(response, "application/json")
 
 
+_CLAIM_FORM_DECODER = {
+    "exp": int,
+    "iat": int,
+    "nbf": int,
+    "auth_time": int,
+    "email_verified": bool
+}
+
+
 class UserTokenHandler(PathHandler):
     path = "/user"
     methods = ["POST"]
@@ -403,6 +412,9 @@ class UserTokenHandler(PathHandler):
                 username = claims.pop("username", claims.pop("user", None))
                 password = claims.pop("password", self.config.default_password)
                 client_id = claims.pop("client_id", self.config.client_id)
+                for k, decode in _CLAIM_FORM_DECODER.items():
+                    if k in claims:
+                        claims[k] = decode(claims[k])
                 if username:
                     if re.match(r"^(19|20)\d{6}-?\d{4}$", username):
                         identitet = Identitetsbeteckning.from_id(
@@ -555,7 +567,7 @@ def main():
     if not jwks:
         parser.exit(1, f"No keys found in {args.keys}")
 
-    paths = [JwksRequestHandler(jwks, args.private_keys)]
+    paths: list[PathHandler] = [JwksRequestHandler(jwks, args.private_keys)]
     if args.signing:
         signer = SigningHandler(jwks)
         paths.append(signer)
