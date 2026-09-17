@@ -251,7 +251,7 @@ def create_user_token(
         claims["iat"] = int(time.time())
 
     if expiry_time and "exp" not in claims:
-        claims["exp"] = claims["int"] + expiry_time
+        claims["exp"] = claims["iat"] + expiry_time
 
     if "sub" not in claims:
         claims["sub"] = str(uuid.uuid4())
